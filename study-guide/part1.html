@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Drupal 11 Zero to Hero - Interview Ready Study Guide</title>
+<style>
+@page { size: A4; margin: 16mm 14mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1a1a1a; }
+h1 { font-size: 26pt; color: #0b4f8a; border-bottom: 3px solid #0b4f8a; padding-bottom: 6px; page-break-before: always; }
+h1.first { page-break-before: avoid; }
+h2 { font-size: 16pt; color: #0b4f8a; margin-top: 22px; border-bottom: 1px solid #c9d6e2; padding-bottom: 3px; }
+h3 { font-size: 12.5pt; color: #1d6fb8; margin-top: 16px; }
+code { font-family: Consolas, "Courier New", monospace; background: #f1f3f5; padding: 1px 4px; border-radius: 3px; font-size: 9.5pt; }
+pre { background: #1e2530; color: #e8edf3; padding: 10px 12px; border-radius: 6px; font-size: 9pt; line-height: 1.35; white-space: pre-wrap; word-wrap: break-word; page-break-inside: avoid; }
+pre code { background: none; color: inherit; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 9.5pt; page-break-inside: auto; }
+th, td { border: 1px solid #bcc7d2; padding: 5px 7px; text-align: left; vertical-align: top; }
+th { background: #e6eef6; }
+tr { page-break-inside: avoid; }
+.box { border-left: 5px solid #1d6fb8; background: #eef5fb; padding: 8px 12px; margin: 10px 0; page-break-inside: avoid; }
+.warn { border-left-color: #c0392b; background: #fdf0ee; }
+.tip { border-left-color: #2e8b57; background: #eef8f2; }
+.ex { border-left-color: #b9770e; background: #fff7e8; }
+.ans { border-left-color: #6c3483; background: #f6eefa; }
+.q { font-weight: bold; color: #0b4f8a; margin-top: 10px; page-break-after: avoid; }
+.cover { text-align: center; margin-top: 90px; }
+.cover h1 { border: none; font-size: 34pt; page-break-before: avoid; }
+ul, ol { margin-top: 3px; margin-bottom: 6px; }
+.small { font-size: 9pt; color: #555; }
+</style></head><body>
+
+<div class="cover">
+<h1 class="first">Drupal 11<br>Zero to Hero</h1>
+<h2 style="border:none">Interview-Ready Study Guide</h2>
+<p>Concepts &middot; Navigation paths &middot; Commands &middot; Code &middot; Exercises with answers &middot; Interview Q&amp;A &middot; Cheat sheet</p>
+<p class="small">Written for Drupal 11.x (project version 11.4.8), PHP 8.3, Drush 13, DDEV. Built for a learner who knows HTML/CSS.</p>
+</div>
+
+<h1>How to use this guide</h1>
+<p>Every chapter has the same pattern, so you can revise fast:</p>
+<ol>
+<li><b>What it is</b> (the meaning, in plain words, and the interview one-liner)</li>
+<li><b>How to do it</b> (admin navigation path or code)</li>
+<li><b>Commands / cheat codes</b> (and when to use them)</li>
+<li><b>Exercise + Answer</b> (do the exercise first, then check the answer)</li>
+<li><b>Interview questions</b> (collected in the last chapters too)</li>
+</ol>
+<div class="box tip"><b>Two-day schedule.</b> Day 1: Chapters 1-9 (basics, site building, no code). Day 2: Chapters 10-17 (theming, modules, APIs, security, performance, deployment). Chapters 18-20 (cheat sheet, interview Q&amp;A, checklist) are for the night before the interview.</div>
+<div class="box warn"><b>Honest note.</b> Two days builds a strong foundation and interview vocabulary. Interviewers also test hands-on experience, so build every exercise yourself, do not only read the answers.</div>
+
+<h2>Contents</h2>
+<ol>
+<li>Drupal basics and architecture</li>
+<li>Your environment: DDEV, Composer, Drush</li>
+<li>Admin navigation map (Drupal 11)</li>
+<li>Content types, fields, view modes</li>
+<li>Views</li>
+<li>Taxonomy, menus, blocks, media</li>
+<li>Users, roles, permissions</li>
+<li>Modules, themes, configuration management, recipes</li>
+<li>Popular contributed modules and site-building tools</li>
+<li>Theming with Twig</li>
+<li>Custom module development (routes, controllers, blocks, forms)</li>
+<li>Services, dependency injection, hooks, events, plugins</li>
+<li>Entity API, database API, config API, state, cache, queue and cron</li>
+<li>Security</li>
+<li>Performance and caching</li>
+<li>Testing, coding standards, debugging</li>
+<li>Migrate, JSON:API, headless, multilingual, deployment</li>
+<li>Drush and Composer cheat sheet</li>
+<li>Interview Q&amp;A (100+ questions)</li>
+<li>Final revision checklist and mini-project</li>
+</ol>
+
+<h1>1. Drupal basics and architecture</h1>
+<h2>1.1 What is Drupal?</h2>
+<p><b>Definition:</b> Drupal is a free, open-source <b>content management framework (CMF)</b> written in <b>PHP</b>, built on <b>Symfony</b> components, using a database (MySQL/MariaDB/PostgreSQL/SQLite), and managed with <b>Composer</b>.</p>
+<div class="box"><b>Interview one-liner:</b> "Drupal is an open-source, API-first content management framework on PHP and Symfony. It is strongest for complex content models, multilingual sites, granular permissions and large enterprise or government sites."</div>
+
+<h2>1.2 CMS vs CMF vs framework</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>CMS</td><td>Software to create and manage content through a UI (WordPress, Drupal).</td></tr>
+<tr><td>CMF</td><td>Content management framework: a CMS whose pieces you can extend and reuse as a framework. Drupal fits here.</td></tr>
+<tr><td>Framework</td><td>Code library for building apps (Symfony, Laravel). Drupal uses Symfony underneath.</td></tr>
+</table>
+
+<h2>1.3 Core terminology (know every word)</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>Core</td><td>The code that ships with Drupal (<code>web/core</code>). Never edit it.</td></tr>
+<tr><td>Contrib</td><td>Modules and themes from drupal.org, in <code>web/modules/contrib</code> and <code>web/themes/contrib</code>. Installed with Composer.</td></tr>
+<tr><td>Custom</td><td>Your own code in <code>web/modules/custom</code> and <code>web/themes/custom</code>.</td></tr>
+<tr><td>Node</td><td>A piece of content (an article, a page).</td></tr>
+<tr><td>Content type</td><td>A template (bundle) for nodes: Article, Page, Event.</td></tr>
+<tr><td>Entity</td><td>Any data object Drupal manages: node, user, term, file, media, comment, block content, config entity.</td></tr>
+<tr><td>Bundle</td><td>A sub-type of an entity type. Node is the entity type, Article is a bundle.</td></tr>
+<tr><td>Field</td><td>A piece of data on an entity (text, date, image, reference).</td></tr>
+<tr><td>Widget</td><td>The input control for a field on the edit form.</td></tr>
+<tr><td>Formatter</td><td>How a field is displayed on output.</td></tr>
+<tr><td>View mode</td><td>A named way to display an entity (Full, Teaser, Card).</td></tr>
+<tr><td>Block</td><td>A reusable piece of output placed in a theme region.</td></tr>
+<tr><td>Region</td><td>An area defined by a theme (header, sidebar, footer).</td></tr>
+<tr><td>Theme</td><td>The presentation layer: Twig templates, CSS, JS.</td></tr>
+<tr><td>Module</td><td>Code that adds functionality.</td></tr>
+<tr><td>Hook</td><td>A function (or, in Drupal 11, a class method with the <code>#[Hook]</code> attribute) that lets a module alter or react to core behavior.</td></tr>
+<tr><td>Plugin</td><td>A swappable piece of functionality discovered automatically (blocks, field types, widgets, formatters, views handlers, queue workers).</td></tr>
+<tr><td>Service</td><td>A reusable PHP object managed by the service container (database, logger, current user).</td></tr>
+<tr><td>Dependency injection (DI)</td><td>Passing a class its dependencies through the constructor instead of creating them inside it.</td></tr>
+<tr><td>Render array</td><td>A PHP array that describes output; Drupal turns it into HTML.</td></tr>
+<tr><td>Twig</td><td>The template engine used for themes.</td></tr>
+<tr><td>Configuration</td><td>Site settings stored in YAML (content types, views, blocks). Exportable.</td></tr>
+<tr><td>Content</td><td>User data stored in the database (nodes, users). Not in config export.</td></tr>
+<tr><td>Recipe</td><td>A reusable package of config, content and module installs applied with <code>drush recipe</code> or <code>php core/scripts/drupal recipe</code>.</td></tr>
+</table>
+
+<h2>1.4 Configuration vs content (very common interview question)</h2>
+<table>
+<tr><th></th><th>Configuration</th><th>Content</th></tr>
+<tr><td>Examples</td><td>Content types, fields, views, roles, blocks, menus config</td><td>Nodes, users, comments, taxonomy terms, media</td></tr>
+<tr><td>Stored</td><td>DB, but exportable to YAML in <code>config/sync</code></td><td>DB only</td></tr>
+<tr><td>Moves between environments by</td><td><code>drush cex</code> / <code>drush cim</code></td><td>Migrations, <code>default_content</code>, or DB copy</td></tr>
+</table>
+
+<h2>1.5 How a Drupal request works (explain this in interviews)</h2>
+<ol>
+<li>The browser requests <code>/events</code>; the web server sends it to <code>web/index.php</code>.</li>
+<li>Drupal boots the <b>kernel</b> (Symfony HttpKernel) and the <b>service container</b>.</li>
+<li><b>Routing</b> matches the path to a route (from a <code>*.routing.yml</code> file or a View).</li>
+<li><b>Access checks</b> decide whether the user may view it.</li>
+<li>A <b>controller</b> (or View, or Entity handler) returns a <b>render array</b>.</li>
+<li>The <b>render system</b> converts it to HTML using <b>Twig templates</b> and the theme, applying <b>cache metadata</b>.</li>
+<li>A <b>Response</b> is returned to the browser.</li>
+</ol>
+
+<h2>1.6 Folder structure of your project</h2>
+<pre><code>drupal112-training/
+  .ddev/               DDEV config (docker environment)
+  composer.json        PHP dependencies (Drupal itself, modules)
+  composer.lock        exact versions installed
+  vendor/              PHP libraries (Symfony, Drush...) - never edit
+  recipes/             Drupal recipes
+  config/sync/         exported configuration (created by you)
+  web/                 the public document root
+    core/              Drupal core - never edit
+    modules/contrib/   downloaded modules
+    modules/custom/    your modules
+    themes/contrib/    downloaded themes
+    themes/custom/     your themes
+    profiles/          install profiles
+    sites/default/
+       settings.php        main settings (DB, config sync path, salt)
+       settings.ddev.php   DDEV generated DB settings
+       files/              uploaded files (public://)
+    index.php          front controller</code></pre>
+
+<h2>1.7 Release cycle (interview favourite)</h2>
+<ul>
+<li>Drupal uses <b>semantic versioning</b>: 11.x. A new minor version (11.1, 11.2...) comes about every six months; patch releases fix bugs and security.</li>
+<li>Major versions (10, 11, 12) remove deprecated code. Move from 10 to 11 by updating to the latest 10.x, fixing deprecations (tool: <b>Upgrade Status</b> module, <b>drupal-check</b>, <b>Rector</b>) and then running <code>composer require drupal/core-recommended:^11 ...</code>.</li>
+<li><b>Drupal CMS</b> is a product built on Drupal core with recipes and a friendly editor experience. It is not a different codebase.</li>
+</ul>
+
+<h2>1.8 Drupal vs WordPress (asked often)</h2>
+<table>
+<tr><th>Topic</th><th>Drupal</th><th>WordPress</th></tr>
+<tr><td>Content modelling</td><td>Custom entities, fields, references in core</td><td>Posts/pages; custom types via plugins</td></tr>
+<tr><td>Permissions</td><td>Granular roles and permissions in core</td><td>Basic roles; plugins for more</td></tr>
+<tr><td>Multilingual</td><td>Built in core</td><td>Plugin required</td></tr>
+<tr><td>Learning curve</td><td>Steeper</td><td>Gentler</td></tr>
+<tr><td>Best fit</td><td>Complex, enterprise, government, multi-site</td><td>Blogs, small business sites</td></tr>
+<tr><td>Dependency mgmt</td><td>Composer</td><td>Plugin directory</td></tr>
+</table>
+
+<h2>Exercise 1.1</h2>
+<div class="box ex"><b>Task:</b> Open your project folder and identify: where core lives, where you will put a custom module, where uploaded files go, and where config will be exported.</div>
+<div class="box ans"><b>Answer:</b> Core: <code>web/core</code>. Custom module: <code>web/modules/custom/&lt;name&gt;</code>. Uploaded files: <code>web/sites/default/files</code>. Config export: the path in <code>$settings['config_sync_directory']</code> in <code>settings.php</code> (we will use <code>../config/sync</code>).</div>
+
+<h1>2. Your environment: DDEV, Composer, Drush</h1>
+<h2>2.1 What each tool is</h2>
+<table>
+<tr><th>Tool</th><th>Meaning</th><th>When you use it</th></tr>
+<tr><td><b>DDEV</b></td><td>Docker-based local dev environment (web server, PHP, database)</td><td>Start and stop the site, run commands inside the container</td></tr>
+<tr><td><b>Composer</b></td><td>PHP dependency manager</td><td>Install/update/remove Drupal, modules, themes, libraries</td></tr>
+<tr><td><b>Drush</b></td><td>Drupal command-line tool</td><td>Clear cache, export config, run updates, create users, install modules</td></tr>
+</table>
+
+<h2>2.2 DDEV commands</h2>
+<table>
+<tr><th>Command</th><th>What it does</th></tr>
+<tr><td><code>ddev start</code></td><td>Start the project containers</td></tr>
+<tr><td><code>ddev stop</code></td><td>Stop containers</td></tr>
+<tr><td><code>ddev restart</code></td><td>Restart after changing config</td></tr>
+<tr><td><code>ddev describe</code></td><td>Show URLs, DB credentials, ports</td></tr>
+<tr><td><code>ddev launch</code></td><td>Open the site in the browser</td></tr>
+<tr><td><code>ddev ssh</code></td><td>Shell inside the web container</td></tr>
+<tr><td><code>ddev drush ...</code></td><td>Run Drush inside the container</td></tr>
+<tr><td><code>ddev composer ...</code></td><td>Run Composer inside the container</td></tr>
+<tr><td><code>ddev import-db --file=db.sql.gz</code></td><td>Import a database dump</td></tr>
+<tr><td><code>ddev export-db --file=db.sql.gz</code></td><td>Export the database</td></tr>
+<tr><td><code>ddev logs</code></td><td>View web server logs</td></tr>
+<tr><td><code>ddev xdebug on</code></td><td>Enable step debugging</td></tr>
+<tr><td><code>ddev mailpit</code></td><td>Open the mail catcher (see outgoing email)</td></tr>
+<tr><td><code>ddev snapshot</code></td><td>Save a database snapshot (backup before risky steps)</td></tr>
+</table>
+
+<h2>2.3 Installing a fresh Drupal 11 site with DDEV (to explain in interviews)</h2>
+<pre><code>mkdir mysite && cd mysite
+ddev config --project-type=drupal11 --docroot=web
+ddev start
+ddev composer create-project drupal/recommended-project:^11 .
+ddev composer require drush/drush
+ddev drush site:install standard --account-name=admin --account-pass=admin -y
+ddev drush uli        # one-time login link
+ddev launch</code></pre>
+
+<h2>2.4 Composer essentials</h2>
+<table>
+<tr><th>Command</th><th>Meaning / use</th></tr>
+<tr><td><code>ddev composer require drupal/pathauto</code></td><td>Download a contrib module and add it to composer.json</td></tr>
+<tr><td><code>ddev composer require drupal/pathauto:^1.13</code></td><td>Specific version constraint</td></tr>
+<tr><td><code>ddev composer remove drupal/pathauto</code></td><td>Remove a package (uninstall the module in Drupal first!)</td></tr>
+<tr><td><code>ddev composer update drupal/core-recommended drupal/core-composer-scaffold --with-all-dependencies</code></td><td>Update Drupal core</td></tr>
+<tr><td><code>ddev composer update drupal/pathauto --with-dependencies</code></td><td>Update one module</td></tr>
+<tr><td><code>ddev composer outdated "drupal/*"</code></td><td>List outdated Drupal packages</td></tr>
+<tr><td><code>ddev composer audit</code></td><td>Check for known security advisories</td></tr>
+<tr><td><code>ddev composer install</code></td><td>Install exactly what composer.lock says (used on servers and by teammates)</td></tr>
+<tr><td><code>ddev composer why-not drupal/core 11.5</code></td><td>Find out why an upgrade is blocked</td></tr>
+</table>
+<div class="box"><b>Meaning of version signs:</b> <code>^1.2</code> = any 1.x at or above 1.2 (not 2.0). <code>~1.2.3</code> = 1.2.x at or above 1.2.3. <code>*</code> = any. <code>dev-main</code> = branch.</div>
+<div class="box"><b>composer.json vs composer.lock:</b> composer.json lists what you asked for; composer.lock records the exact versions installed. Commit both. On deployment run <code>composer install</code> (reads the lock), not <code>update</code>.</div>
+<div class="box warn"><b>Never</b> download modules by hand into <code>web/modules</code> and <b>never</b> edit core or contrib. Use Composer, and for fixes use patches (<code>cweagans/composer-patches</code>).</div>
+
+<h2>2.5 Drush essentials (more in Chapter 18)</h2>
+<table>
+<tr><th>Command (alias)</th><th>When to use</th></tr>
+<tr><td><code>drush cr</code> (cache-rebuild)</td><td>Clear all caches. After changing Twig, services, routing, info.yml, libraries.</td></tr>
+<tr><td><code>drush uli</code></td><td>One-time admin login link when you forgot the password</td></tr>
+<tr><td><code>drush en pathauto -y</code> (pm:install)</td><td>Install a module</td></tr>
+<tr><td><code>drush pmu pathauto -y</code> (pm:uninstall)</td><td>Uninstall a module</td></tr>
+<tr><td><code>drush cex -y</code> (config:export)</td><td>Export active config to YAML files</td></tr>
+<tr><td><code>drush cim -y</code> (config:import)</td><td>Import YAML config into the site</td></tr>
+<tr><td><code>drush updb -y</code> (updatedb)</td><td>Run database updates after code update</td></tr>
+<tr><td><code>drush status</code> (st)</td><td>Show Drupal version, DB, paths</td></tr>
+<tr><td><code>drush watchdog:show</code> (ws)</td><td>Show recent logs</td></tr>
+<tr><td><code>drush user:create editor1 --mail=e@x.com --password=pass</code></td><td>Create a user</td></tr>
+<tr><td><code>drush user:role:add editor editor1</code></td><td>Give a role to a user</td></tr>
+<tr><td><code>drush sql:dump &gt; backup.sql</code></td><td>Database backup</td></tr>
+<tr><td><code>drush php:eval "echo 1;"</code></td><td>Run quick PHP</td></tr>
+<tr><td><code>drush generate module</code></td><td>Scaffold code (modules, controllers, forms, plugins)</td></tr>
+</table>
+
+<h2>Exercise 2.1</h2>
+<div class="box ex"><b>Task:</b> (a) Start the project and log in as admin without knowing the password. (b) Install the Pathauto module. (c) Check your Drupal version.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev start
+ddev drush uli                     # open the link it prints
+ddev composer require drupal/token drupal/pathauto
+ddev drush en token pathauto -y
+ddev drush status                  # shows Drupal version</code></pre>
+</div>
+
+<h1>3. Admin navigation map (Drupal 11)</h1>
+<p>Drupal 11 offers the classic <b>Toolbar</b> (top bar plus a drawer) and the newer <b>Navigation</b> module (a left vertical sidebar, in core). Both lead to the same pages. The <b>Gin</b> admin theme is the modern admin look. Learn the URL; it works no matter which menu you use.</p>
+<table>
+<tr><th>Task</th><th>Menu path</th><th>URL</th></tr>
+<tr><td>All content</td><td>Content</td><td><code>/admin/content</code></td></tr>
+<tr><td>Add content</td><td>Content &rarr; Add content</td><td><code>/node/add</code></td></tr>
+<tr><td>Custom block library</td><td>Content &rarr; Blocks</td><td><code>/admin/content/block</code></td></tr>
+<tr><td>Media library</td><td>Content &rarr; Media</td><td><code>/admin/content/media</code></td></tr>
+<tr><td>Files</td><td>Content &rarr; Files</td><td><code>/admin/content/files</code></td></tr>
+<tr><td>Comments</td><td>Content &rarr; Comments</td><td><code>/admin/content/comment</code></td></tr>
+<tr><td>Content types</td><td>Structure &rarr; Content types</td><td><code>/admin/structure/types</code></td></tr>
+<tr><td>Fields of a type</td><td>Structure &rarr; Content types &rarr; Manage fields</td><td><code>/admin/structure/types/manage/TYPE/fields</code></td></tr>
+<tr><td>Form display</td><td>... &rarr; Manage form display</td><td><code>.../TYPE/form-display</code></td></tr>
+<tr><td>Output display</td><td>... &rarr; Manage display</td><td><code>.../TYPE/display</code></td></tr>
+<tr><td>Views</td><td>Structure &rarr; Views</td><td><code>/admin/structure/views</code></td></tr>
+<tr><td>Add view</td><td>Structure &rarr; Views &rarr; Add view</td><td><code>/admin/structure/views/add</code></td></tr>
+<tr><td>Block layout</td><td>Structure &rarr; Block layout</td><td><code>/admin/structure/block</code></td></tr>
+<tr><td>Menus</td><td>Structure &rarr; Menus</td><td><code>/admin/structure/menu</code></td></tr>
+<tr><td>Taxonomy</td><td>Structure &rarr; Taxonomy</td><td><code>/admin/structure/taxonomy</code></td></tr>
+<tr><td>Display modes</td><td>Structure &rarr; Display modes</td><td><code>/admin/structure/display-modes</code></td></tr>
+<tr><td>Media types</td><td>Structure &rarr; Media types</td><td><code>/admin/structure/media</code></td></tr>
+<tr><td>Block content types</td><td>Structure &rarr; Block content types</td><td><code>/admin/structure/block-content</code></td></tr>
+<tr><td>URL aliases</td><td>Configuration &rarr; Search and metadata &rarr; URL aliases</td><td><code>/admin/config/search/path</code></td></tr>
+<tr><td>Pathauto patterns</td><td>Configuration &rarr; Search and metadata &rarr; URL aliases &rarr; Patterns</td><td><code>/admin/config/search/path/patterns</code></td></tr>
+<tr><td>Appearance (themes)</td><td>Appearance</td><td><code>/admin/appearance</code></td></tr>
+<tr><td>Modules</td><td>Extend</td><td><code>/admin/modules</code></td></tr>
+<tr><td>Uninstall modules</td><td>Extend &rarr; Uninstall</td><td><code>/admin/modules/uninstall</code></td></tr>
+<tr><td>Site information</td><td>Configuration &rarr; System &rarr; Basic site settings</td><td><code>/admin/config/system/site-information</code></td></tr>
+<tr><td>Text formats and editors</td><td>Configuration &rarr; Content authoring &rarr; Text formats</td><td><code>/admin/config/content/formats</code></td></tr>
+<tr><td>Performance (caching)</td><td>Configuration &rarr; Development &rarr; Performance</td><td><code>/admin/config/development/performance</code></td></tr>
+<tr><td>Logging</td><td>Configuration &rarr; Development &rarr; Logging and errors</td><td><code>/admin/config/development/logging</code></td></tr>
+<tr><td>Languages</td><td>Configuration &rarr; Regional and language &rarr; Languages</td><td><code>/admin/config/regional/language</code></td></tr>
+<tr><td>Regional settings (timezone)</td><td>Configuration &rarr; Regional and language &rarr; Regional settings</td><td><code>/admin/config/regional/settings</code></td></tr>
+<tr><td>Config sync UI</td><td>Configuration &rarr; Development &rarr; Configuration synchronization</td><td><code>/admin/config/development/configuration</code></td></tr>
+<tr><td>Cron</td><td>Configuration &rarr; System &rarr; Cron</td><td><code>/admin/config/system/cron</code></td></tr>
+<tr><td>Image styles</td><td>Configuration &rarr; Media &rarr; Image styles</td><td><code>/admin/config/media/image-styles</code></td></tr>
+<tr><td>People</td><td>People</td><td><code>/admin/people</code></td></tr>
+<tr><td>Roles</td><td>People &rarr; Roles</td><td><code>/admin/people/roles</code></td></tr>
+<tr><td>Permissions</td><td>People &rarr; Permissions</td><td><code>/admin/people/permissions</code></td></tr>
+<tr><td>Account settings</td><td>Configuration &rarr; People &rarr; Account settings</td><td><code>/admin/config/people/accounts</code></td></tr>
+<tr><td>Status report</td><td>Reports &rarr; Status report</td><td><code>/admin/reports/status</code></td></tr>
+<tr><td>Recent log messages</td><td>Reports &rarr; Recent log messages</td><td><code>/admin/reports/dblog</code></td></tr>
+<tr><td>Available updates</td><td>Reports &rarr; Available updates</td><td><code>/admin/reports/updates</code></td></tr>
+<tr><td>Field list</td><td>Reports &rarr; Field list</td><td><code>/admin/reports/fields</code></td></tr>
+<tr><td>Help</td><td>Help</td><td><code>/admin/help</code></td></tr>
+</table>
+<div class="box tip"><b>Habit:</b> When something misbehaves, check <code>/admin/reports/dblog</code> and <code>/admin/reports/status</code> first, then run <code>ddev drush cr</code>.</div>
+
+</body></html>

@@ -1,0 +1,22 @@
+uuid: 56ca872c-4892-4052-a711-062d0bc86720
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - electronics_theme
+_core:
+  default_config_hash: VfPFqqxfkomud5CO8DUijw85QIl9GIxh_nIxLOYESxg
+id: electronics_theme_help
+theme: electronics_theme
+region: sidebar_first
+weight: 0
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  label_display: '0'
+  provider: help
+visibility: {  }

@@ -1,0 +1,33 @@
+# Composer-managed
+/vendor/
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+/web/recipes/contrib/
+/recipes/*/
+!/recipes/.gitkeep
+
+# Drupal runtime / secrets
+/web/sites/*/settings*.php
+/web/sites/*/services*.yml
+/web/sites/*/files/
+/web/sites/*/private/
+/web/sites/simpletest
+/config/sync/.htaccess
+
+# DDEV generated
+/.ddev/.gitignore
+/.ddev/.homeadditions/.bash_history
+/.ddev/db_snapshots/
+/.ddev/.ddev-docker-compose-*.yaml
+/.ddev/mutagen/
+/.ddev/.global_commands
+
+# Claude Code, IDE, OS
+/.claude/settings.local.json
+.idea/
+.vscode/
+.DS_Store
+node_modules/

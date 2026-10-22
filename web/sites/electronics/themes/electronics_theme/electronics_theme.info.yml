@@ -1,0 +1,7 @@
+name: Electronics Theme
+type: theme
+description: Theme for the Electronics Theme site only.
+core_version_requirement: ^11
+base theme: olivero
+libraries:
+  - electronics_theme/global

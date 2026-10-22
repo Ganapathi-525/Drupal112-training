@@ -1,0 +1,1871 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Drupal 11 Zero to Hero - Interview Ready Study Guide</title>
+<style>
+@page { size: A4; margin: 16mm 14mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1a1a1a; }
+h1 { font-size: 26pt; color: #0b4f8a; border-bottom: 3px solid #0b4f8a; padding-bottom: 6px; page-break-before: always; }
+h1.first { page-break-before: avoid; }
+h2 { font-size: 16pt; color: #0b4f8a; margin-top: 22px; border-bottom: 1px solid #c9d6e2; padding-bottom: 3px; }
+h3 { font-size: 12.5pt; color: #1d6fb8; margin-top: 16px; }
+code { font-family: Consolas, "Courier New", monospace; background: #f1f3f5; padding: 1px 4px; border-radius: 3px; font-size: 9.5pt; }
+pre { background: #1e2530; color: #e8edf3; padding: 10px 12px; border-radius: 6px; font-size: 9pt; line-height: 1.35; white-space: pre-wrap; word-wrap: break-word; page-break-inside: avoid; }
+pre code { background: none; color: inherit; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 9.5pt; page-break-inside: auto; }
+th, td { border: 1px solid #bcc7d2; padding: 5px 7px; text-align: left; vertical-align: top; }
+th { background: #e6eef6; }
+tr { page-break-inside: avoid; }
+.box { border-left: 5px solid #1d6fb8; background: #eef5fb; padding: 8px 12px; margin: 10px 0; page-break-inside: avoid; }
+.warn { border-left-color: #c0392b; background: #fdf0ee; }
+.tip { border-left-color: #2e8b57; background: #eef8f2; }
+.ex { border-left-color: #b9770e; background: #fff7e8; }
+.ans { border-left-color: #6c3483; background: #f6eefa; }
+.q { font-weight: bold; color: #0b4f8a; margin-top: 10px; page-break-after: avoid; }
+.cover { text-align: center; margin-top: 90px; }
+.cover h1 { border: none; font-size: 34pt; page-break-before: avoid; }
+ul, ol { margin-top: 3px; margin-bottom: 6px; }
+.small { font-size: 9pt; color: #555; }
+</style></head><body>
+
+<div class="cover">
+<h1 class="first">Drupal 11<br>Zero to Hero</h1>
+<h2 style="border:none">Interview-Ready Study Guide</h2>
+<p>Concepts &middot; Navigation paths &middot; Commands &middot; Code &middot; Exercises with answers &middot; Interview Q&amp;A &middot; Cheat sheet</p>
+<p class="small">Written for Drupal 11.x (project version 11.4.8), PHP 8.3, Drush 13, DDEV. Built for a learner who knows HTML/CSS.</p>
+</div>
+
+<h1>How to use this guide</h1>
+<p>Every chapter has the same pattern, so you can revise fast:</p>
+<ol>
+<li><b>What it is</b> (the meaning, in plain words, and the interview one-liner)</li>
+<li><b>How to do it</b> (admin navigation path or code)</li>
+<li><b>Commands / cheat codes</b> (and when to use them)</li>
+<li><b>Exercise + Answer</b> (do the exercise first, then check the answer)</li>
+<li><b>Interview questions</b> (collected in the last chapters too)</li>
+</ol>
+<div class="box tip"><b>Two-day schedule.</b> Day 1: Chapters 1-9 (basics, site building, no code). Day 2: Chapters 10-17 (theming, modules, APIs, security, performance, deployment). Chapters 18-20 (cheat sheet, interview Q&amp;A, checklist) are for the night before the interview.</div>
+<div class="box warn"><b>Honest note.</b> Two days builds a strong foundation and interview vocabulary. Interviewers also test hands-on experience, so build every exercise yourself, do not only read the answers.</div>
+
+<h2>Contents</h2>
+<ol>
+<li>Drupal basics and architecture</li>
+<li>Your environment: DDEV, Composer, Drush</li>
+<li>Admin navigation map (Drupal 11)</li>
+<li>Content types, fields, view modes</li>
+<li>Views</li>
+<li>Taxonomy, menus, blocks, media</li>
+<li>Users, roles, permissions</li>
+<li>Modules, themes, configuration management, recipes</li>
+<li>Popular contributed modules and site-building tools</li>
+<li>Theming with Twig</li>
+<li>Custom module development (routes, controllers, blocks, forms)</li>
+<li>Services, dependency injection, hooks, events, plugins</li>
+<li>Entity API, database API, config API, state, cache, queue and cron</li>
+<li>Security</li>
+<li>Performance and caching</li>
+<li>Testing, coding standards, debugging</li>
+<li>Migrate, JSON:API, headless, multilingual, deployment</li>
+<li>Drush and Composer cheat sheet</li>
+<li>Interview Q&amp;A (100+ questions)</li>
+<li>Final revision checklist and mini-project</li>
+</ol>
+
+<h1>1. Drupal basics and architecture</h1>
+<h2>1.1 What is Drupal?</h2>
+<p><b>Definition:</b> Drupal is a free, open-source <b>content management framework (CMF)</b> written in <b>PHP</b>, built on <b>Symfony</b> components, using a database (MySQL/MariaDB/PostgreSQL/SQLite), and managed with <b>Composer</b>.</p>
+<div class="box"><b>Interview one-liner:</b> "Drupal is an open-source, API-first content management framework on PHP and Symfony. It is strongest for complex content models, multilingual sites, granular permissions and large enterprise or government sites."</div>
+
+<h2>1.2 CMS vs CMF vs framework</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>CMS</td><td>Software to create and manage content through a UI (WordPress, Drupal).</td></tr>
+<tr><td>CMF</td><td>Content management framework: a CMS whose pieces you can extend and reuse as a framework. Drupal fits here.</td></tr>
+<tr><td>Framework</td><td>Code library for building apps (Symfony, Laravel). Drupal uses Symfony underneath.</td></tr>
+</table>
+
+<h2>1.3 Core terminology (know every word)</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>Core</td><td>The code that ships with Drupal (<code>web/core</code>). Never edit it.</td></tr>
+<tr><td>Contrib</td><td>Modules and themes from drupal.org, in <code>web/modules/contrib</code> and <code>web/themes/contrib</code>. Installed with Composer.</td></tr>
+<tr><td>Custom</td><td>Your own code in <code>web/modules/custom</code> and <code>web/themes/custom</code>.</td></tr>
+<tr><td>Node</td><td>A piece of content (an article, a page).</td></tr>
+<tr><td>Content type</td><td>A template (bundle) for nodes: Article, Page, Event.</td></tr>
+<tr><td>Entity</td><td>Any data object Drupal manages: node, user, term, file, media, comment, block content, config entity.</td></tr>
+<tr><td>Bundle</td><td>A sub-type of an entity type. Node is the entity type, Article is a bundle.</td></tr>
+<tr><td>Field</td><td>A piece of data on an entity (text, date, image, reference).</td></tr>
+<tr><td>Widget</td><td>The input control for a field on the edit form.</td></tr>
+<tr><td>Formatter</td><td>How a field is displayed on output.</td></tr>
+<tr><td>View mode</td><td>A named way to display an entity (Full, Teaser, Card).</td></tr>
+<tr><td>Block</td><td>A reusable piece of output placed in a theme region.</td></tr>
+<tr><td>Region</td><td>An area defined by a theme (header, sidebar, footer).</td></tr>
+<tr><td>Theme</td><td>The presentation layer: Twig templates, CSS, JS.</td></tr>
+<tr><td>Module</td><td>Code that adds functionality.</td></tr>
+<tr><td>Hook</td><td>A function (or, in Drupal 11, a class method with the <code>#[Hook]</code> attribute) that lets a module alter or react to core behavior.</td></tr>
+<tr><td>Plugin</td><td>A swappable piece of functionality discovered automatically (blocks, field types, widgets, formatters, views handlers, queue workers).</td></tr>
+<tr><td>Service</td><td>A reusable PHP object managed by the service container (database, logger, current user).</td></tr>
+<tr><td>Dependency injection (DI)</td><td>Passing a class its dependencies through the constructor instead of creating them inside it.</td></tr>
+<tr><td>Render array</td><td>A PHP array that describes output; Drupal turns it into HTML.</td></tr>
+<tr><td>Twig</td><td>The template engine used for themes.</td></tr>
+<tr><td>Configuration</td><td>Site settings stored in YAML (content types, views, blocks). Exportable.</td></tr>
+<tr><td>Content</td><td>User data stored in the database (nodes, users). Not in config export.</td></tr>
+<tr><td>Recipe</td><td>A reusable package of config, content and module installs applied with <code>drush recipe</code> or <code>php core/scripts/drupal recipe</code>.</td></tr>
+</table>
+
+<h2>1.4 Configuration vs content (very common interview question)</h2>
+<table>
+<tr><th></th><th>Configuration</th><th>Content</th></tr>
+<tr><td>Examples</td><td>Content types, fields, views, roles, blocks, menus config</td><td>Nodes, users, comments, taxonomy terms, media</td></tr>
+<tr><td>Stored</td><td>DB, but exportable to YAML in <code>config/sync</code></td><td>DB only</td></tr>
+<tr><td>Moves between environments by</td><td><code>drush cex</code> / <code>drush cim</code></td><td>Migrations, <code>default_content</code>, or DB copy</td></tr>
+</table>
+
+<h2>1.5 How a Drupal request works (explain this in interviews)</h2>
+<ol>
+<li>The browser requests <code>/events</code>; the web server sends it to <code>web/index.php</code>.</li>
+<li>Drupal boots the <b>kernel</b> (Symfony HttpKernel) and the <b>service container</b>.</li>
+<li><b>Routing</b> matches the path to a route (from a <code>*.routing.yml</code> file or a View).</li>
+<li><b>Access checks</b> decide whether the user may view it.</li>
+<li>A <b>controller</b> (or View, or Entity handler) returns a <b>render array</b>.</li>
+<li>The <b>render system</b> converts it to HTML using <b>Twig templates</b> and the theme, applying <b>cache metadata</b>.</li>
+<li>A <b>Response</b> is returned to the browser.</li>
+</ol>
+
+<h2>1.6 Folder structure of your project</h2>
+<pre><code>drupal112-training/
+  .ddev/               DDEV config (docker environment)
+  composer.json        PHP dependencies (Drupal itself, modules)
+  composer.lock        exact versions installed
+  vendor/              PHP libraries (Symfony, Drush...) - never edit
+  recipes/             Drupal recipes
+  config/sync/         exported configuration (created by you)
+  web/                 the public document root
+    core/              Drupal core - never edit
+    modules/contrib/   downloaded modules
+    modules/custom/    your modules
+    themes/contrib/    downloaded themes
+    themes/custom/     your themes
+    profiles/          install profiles
+    sites/default/
+       settings.php        main settings (DB, config sync path, salt)
+       settings.ddev.php   DDEV generated DB settings
+       files/              uploaded files (public://)
+    index.php          front controller</code></pre>
+
+<h2>1.7 Release cycle (interview favourite)</h2>
+<ul>
+<li>Drupal uses <b>semantic versioning</b>: 11.x. A new minor version (11.1, 11.2...) comes about every six months; patch releases fix bugs and security.</li>
+<li>Major versions (10, 11, 12) remove deprecated code. Move from 10 to 11 by updating to the latest 10.x, fixing deprecations (tool: <b>Upgrade Status</b> module, <b>drupal-check</b>, <b>Rector</b>) and then running <code>composer require drupal/core-recommended:^11 ...</code>.</li>
+<li><b>Drupal CMS</b> is a product built on Drupal core with recipes and a friendly editor experience. It is not a different codebase.</li>
+</ul>
+
+<h2>1.8 Drupal vs WordPress (asked often)</h2>
+<table>
+<tr><th>Topic</th><th>Drupal</th><th>WordPress</th></tr>
+<tr><td>Content modelling</td><td>Custom entities, fields, references in core</td><td>Posts/pages; custom types via plugins</td></tr>
+<tr><td>Permissions</td><td>Granular roles and permissions in core</td><td>Basic roles; plugins for more</td></tr>
+<tr><td>Multilingual</td><td>Built in core</td><td>Plugin required</td></tr>
+<tr><td>Learning curve</td><td>Steeper</td><td>Gentler</td></tr>
+<tr><td>Best fit</td><td>Complex, enterprise, government, multi-site</td><td>Blogs, small business sites</td></tr>
+<tr><td>Dependency mgmt</td><td>Composer</td><td>Plugin directory</td></tr>
+</table>
+
+<h2>Exercise 1.1</h2>
+<div class="box ex"><b>Task:</b> Open your project folder and identify: where core lives, where you will put a custom module, where uploaded files go, and where config will be exported.</div>
+<div class="box ans"><b>Answer:</b> Core: <code>web/core</code>. Custom module: <code>web/modules/custom/&lt;name&gt;</code>. Uploaded files: <code>web/sites/default/files</code>. Config export: the path in <code>$settings['config_sync_directory']</code> in <code>settings.php</code> (we will use <code>../config/sync</code>).</div>
+
+<h1>2. Your environment: DDEV, Composer, Drush</h1>
+<h2>2.1 What each tool is</h2>
+<table>
+<tr><th>Tool</th><th>Meaning</th><th>When you use it</th></tr>
+<tr><td><b>DDEV</b></td><td>Docker-based local dev environment (web server, PHP, database)</td><td>Start and stop the site, run commands inside the container</td></tr>
+<tr><td><b>Composer</b></td><td>PHP dependency manager</td><td>Install/update/remove Drupal, modules, themes, libraries</td></tr>
+<tr><td><b>Drush</b></td><td>Drupal command-line tool</td><td>Clear cache, export config, run updates, create users, install modules</td></tr>
+</table>
+
+<h2>2.2 DDEV commands</h2>
+<table>
+<tr><th>Command</th><th>What it does</th></tr>
+<tr><td><code>ddev start</code></td><td>Start the project containers</td></tr>
+<tr><td><code>ddev stop</code></td><td>Stop containers</td></tr>
+<tr><td><code>ddev restart</code></td><td>Restart after changing config</td></tr>
+<tr><td><code>ddev describe</code></td><td>Show URLs, DB credentials, ports</td></tr>
+<tr><td><code>ddev launch</code></td><td>Open the site in the browser</td></tr>
+<tr><td><code>ddev ssh</code></td><td>Shell inside the web container</td></tr>
+<tr><td><code>ddev drush ...</code></td><td>Run Drush inside the container</td></tr>
+<tr><td><code>ddev composer ...</code></td><td>Run Composer inside the container</td></tr>
+<tr><td><code>ddev import-db --file=db.sql.gz</code></td><td>Import a database dump</td></tr>
+<tr><td><code>ddev export-db --file=db.sql.gz</code></td><td>Export the database</td></tr>
+<tr><td><code>ddev logs</code></td><td>View web server logs</td></tr>
+<tr><td><code>ddev xdebug on</code></td><td>Enable step debugging</td></tr>
+<tr><td><code>ddev mailpit</code></td><td>Open the mail catcher (see outgoing email)</td></tr>
+<tr><td><code>ddev snapshot</code></td><td>Save a database snapshot (backup before risky steps)</td></tr>
+</table>
+
+<h2>2.3 Installing a fresh Drupal 11 site with DDEV (to explain in interviews)</h2>
+<pre><code>mkdir mysite && cd mysite
+ddev config --project-type=drupal11 --docroot=web
+ddev start
+ddev composer create-project drupal/recommended-project:^11 .
+ddev composer require drush/drush
+ddev drush site:install standard --account-name=admin --account-pass=admin -y
+ddev drush uli        # one-time login link
+ddev launch</code></pre>
+
+<h2>2.4 Composer essentials</h2>
+<table>
+<tr><th>Command</th><th>Meaning / use</th></tr>
+<tr><td><code>ddev composer require drupal/pathauto</code></td><td>Download a contrib module and add it to composer.json</td></tr>
+<tr><td><code>ddev composer require drupal/pathauto:^1.13</code></td><td>Specific version constraint</td></tr>
+<tr><td><code>ddev composer remove drupal/pathauto</code></td><td>Remove a package (uninstall the module in Drupal first!)</td></tr>
+<tr><td><code>ddev composer update drupal/core-recommended drupal/core-composer-scaffold --with-all-dependencies</code></td><td>Update Drupal core</td></tr>
+<tr><td><code>ddev composer update drupal/pathauto --with-dependencies</code></td><td>Update one module</td></tr>
+<tr><td><code>ddev composer outdated "drupal/*"</code></td><td>List outdated Drupal packages</td></tr>
+<tr><td><code>ddev composer audit</code></td><td>Check for known security advisories</td></tr>
+<tr><td><code>ddev composer install</code></td><td>Install exactly what composer.lock says (used on servers and by teammates)</td></tr>
+<tr><td><code>ddev composer why-not drupal/core 11.5</code></td><td>Find out why an upgrade is blocked</td></tr>
+</table>
+<div class="box"><b>Meaning of version signs:</b> <code>^1.2</code> = any 1.x at or above 1.2 (not 2.0). <code>~1.2.3</code> = 1.2.x at or above 1.2.3. <code>*</code> = any. <code>dev-main</code> = branch.</div>
+<div class="box"><b>composer.json vs composer.lock:</b> composer.json lists what you asked for; composer.lock records the exact versions installed. Commit both. On deployment run <code>composer install</code> (reads the lock), not <code>update</code>.</div>
+<div class="box warn"><b>Never</b> download modules by hand into <code>web/modules</code> and <b>never</b> edit core or contrib. Use Composer, and for fixes use patches (<code>cweagans/composer-patches</code>).</div>
+
+<h2>2.5 Drush essentials (more in Chapter 18)</h2>
+<table>
+<tr><th>Command (alias)</th><th>When to use</th></tr>
+<tr><td><code>drush cr</code> (cache-rebuild)</td><td>Clear all caches. After changing Twig, services, routing, info.yml, libraries.</td></tr>
+<tr><td><code>drush uli</code></td><td>One-time admin login link when you forgot the password</td></tr>
+<tr><td><code>drush en pathauto -y</code> (pm:install)</td><td>Install a module</td></tr>
+<tr><td><code>drush pmu pathauto -y</code> (pm:uninstall)</td><td>Uninstall a module</td></tr>
+<tr><td><code>drush cex -y</code> (config:export)</td><td>Export active config to YAML files</td></tr>
+<tr><td><code>drush cim -y</code> (config:import)</td><td>Import YAML config into the site</td></tr>
+<tr><td><code>drush updb -y</code> (updatedb)</td><td>Run database updates after code update</td></tr>
+<tr><td><code>drush status</code> (st)</td><td>Show Drupal version, DB, paths</td></tr>
+<tr><td><code>drush watchdog:show</code> (ws)</td><td>Show recent logs</td></tr>
+<tr><td><code>drush user:create editor1 --mail=e@x.com --password=pass</code></td><td>Create a user</td></tr>
+<tr><td><code>drush user:role:add editor editor1</code></td><td>Give a role to a user</td></tr>
+<tr><td><code>drush sql:dump &gt; backup.sql</code></td><td>Database backup</td></tr>
+<tr><td><code>drush php:eval "echo 1;"</code></td><td>Run quick PHP</td></tr>
+<tr><td><code>drush generate module</code></td><td>Scaffold code (modules, controllers, forms, plugins)</td></tr>
+</table>
+
+<h2>Exercise 2.1</h2>
+<div class="box ex"><b>Task:</b> (a) Start the project and log in as admin without knowing the password. (b) Install the Pathauto module. (c) Check your Drupal version.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev start
+ddev drush uli                     # open the link it prints
+ddev composer require drupal/token drupal/pathauto
+ddev drush en token pathauto -y
+ddev drush status                  # shows Drupal version</code></pre>
+</div>
+
+<h1>3. Admin navigation map (Drupal 11)</h1>
+<p>Drupal 11 offers the classic <b>Toolbar</b> (top bar plus a drawer) and the newer <b>Navigation</b> module (a left vertical sidebar, in core). Both lead to the same pages. The <b>Gin</b> admin theme is the modern admin look. Learn the URL; it works no matter which menu you use.</p>
+<table>
+<tr><th>Task</th><th>Menu path</th><th>URL</th></tr>
+<tr><td>All content</td><td>Content</td><td><code>/admin/content</code></td></tr>
+<tr><td>Add content</td><td>Content &rarr; Add content</td><td><code>/node/add</code></td></tr>
+<tr><td>Custom block library</td><td>Content &rarr; Blocks</td><td><code>/admin/content/block</code></td></tr>
+<tr><td>Media library</td><td>Content &rarr; Media</td><td><code>/admin/content/media</code></td></tr>
+<tr><td>Files</td><td>Content &rarr; Files</td><td><code>/admin/content/files</code></td></tr>
+<tr><td>Comments</td><td>Content &rarr; Comments</td><td><code>/admin/content/comment</code></td></tr>
+<tr><td>Content types</td><td>Structure &rarr; Content types</td><td><code>/admin/structure/types</code></td></tr>
+<tr><td>Fields of a type</td><td>Structure &rarr; Content types &rarr; Manage fields</td><td><code>/admin/structure/types/manage/TYPE/fields</code></td></tr>
+<tr><td>Form display</td><td>... &rarr; Manage form display</td><td><code>.../TYPE/form-display</code></td></tr>
+<tr><td>Output display</td><td>... &rarr; Manage display</td><td><code>.../TYPE/display</code></td></tr>
+<tr><td>Views</td><td>Structure &rarr; Views</td><td><code>/admin/structure/views</code></td></tr>
+<tr><td>Add view</td><td>Structure &rarr; Views &rarr; Add view</td><td><code>/admin/structure/views/add</code></td></tr>
+<tr><td>Block layout</td><td>Structure &rarr; Block layout</td><td><code>/admin/structure/block</code></td></tr>
+<tr><td>Menus</td><td>Structure &rarr; Menus</td><td><code>/admin/structure/menu</code></td></tr>
+<tr><td>Taxonomy</td><td>Structure &rarr; Taxonomy</td><td><code>/admin/structure/taxonomy</code></td></tr>
+<tr><td>Display modes</td><td>Structure &rarr; Display modes</td><td><code>/admin/structure/display-modes</code></td></tr>
+<tr><td>Media types</td><td>Structure &rarr; Media types</td><td><code>/admin/structure/media</code></td></tr>
+<tr><td>Block content types</td><td>Structure &rarr; Block content types</td><td><code>/admin/structure/block-content</code></td></tr>
+<tr><td>URL aliases</td><td>Configuration &rarr; Search and metadata &rarr; URL aliases</td><td><code>/admin/config/search/path</code></td></tr>
+<tr><td>Pathauto patterns</td><td>Configuration &rarr; Search and metadata &rarr; URL aliases &rarr; Patterns</td><td><code>/admin/config/search/path/patterns</code></td></tr>
+<tr><td>Appearance (themes)</td><td>Appearance</td><td><code>/admin/appearance</code></td></tr>
+<tr><td>Modules</td><td>Extend</td><td><code>/admin/modules</code></td></tr>
+<tr><td>Uninstall modules</td><td>Extend &rarr; Uninstall</td><td><code>/admin/modules/uninstall</code></td></tr>
+<tr><td>Site information</td><td>Configuration &rarr; System &rarr; Basic site settings</td><td><code>/admin/config/system/site-information</code></td></tr>
+<tr><td>Text formats and editors</td><td>Configuration &rarr; Content authoring &rarr; Text formats</td><td><code>/admin/config/content/formats</code></td></tr>
+<tr><td>Performance (caching)</td><td>Configuration &rarr; Development &rarr; Performance</td><td><code>/admin/config/development/performance</code></td></tr>
+<tr><td>Logging</td><td>Configuration &rarr; Development &rarr; Logging and errors</td><td><code>/admin/config/development/logging</code></td></tr>
+<tr><td>Languages</td><td>Configuration &rarr; Regional and language &rarr; Languages</td><td><code>/admin/config/regional/language</code></td></tr>
+<tr><td>Regional settings (timezone)</td><td>Configuration &rarr; Regional and language &rarr; Regional settings</td><td><code>/admin/config/regional/settings</code></td></tr>
+<tr><td>Config sync UI</td><td>Configuration &rarr; Development &rarr; Configuration synchronization</td><td><code>/admin/config/development/configuration</code></td></tr>
+<tr><td>Cron</td><td>Configuration &rarr; System &rarr; Cron</td><td><code>/admin/config/system/cron</code></td></tr>
+<tr><td>Image styles</td><td>Configuration &rarr; Media &rarr; Image styles</td><td><code>/admin/config/media/image-styles</code></td></tr>
+<tr><td>People</td><td>People</td><td><code>/admin/people</code></td></tr>
+<tr><td>Roles</td><td>People &rarr; Roles</td><td><code>/admin/people/roles</code></td></tr>
+<tr><td>Permissions</td><td>People &rarr; Permissions</td><td><code>/admin/people/permissions</code></td></tr>
+<tr><td>Account settings</td><td>Configuration &rarr; People &rarr; Account settings</td><td><code>/admin/config/people/accounts</code></td></tr>
+<tr><td>Status report</td><td>Reports &rarr; Status report</td><td><code>/admin/reports/status</code></td></tr>
+<tr><td>Recent log messages</td><td>Reports &rarr; Recent log messages</td><td><code>/admin/reports/dblog</code></td></tr>
+<tr><td>Available updates</td><td>Reports &rarr; Available updates</td><td><code>/admin/reports/updates</code></td></tr>
+<tr><td>Field list</td><td>Reports &rarr; Field list</td><td><code>/admin/reports/fields</code></td></tr>
+<tr><td>Help</td><td>Help</td><td><code>/admin/help</code></td></tr>
+</table>
+<div class="box tip"><b>Habit:</b> When something misbehaves, check <code>/admin/reports/dblog</code> and <code>/admin/reports/status</code> first, then run <code>ddev drush cr</code>.</div>
+
+
+<h1>4. Content types, fields, view modes</h1>
+<h2>4.1 Meaning</h2>
+<p><b>Content type</b> = a bundle of the node entity type with its own fields and settings. <b>Field</b> = typed data attached to an entity bundle. A field has a <b>storage</b> (type, cardinality: shared across bundles) and an <b>instance/config</b> (label, required, per bundle).</p>
+<div class="box"><b>Interview one-liner:</b> "A content type defines the structure of a kind of content. Fields hold the data, widgets control the edit form, formatters control the output, and view modes let the same content render differently in teasers, cards or full pages."</div>
+
+<h2>4.2 Core field types</h2>
+<table>
+<tr><th>Field type</th><th>Use for</th></tr>
+<tr><td>Text (plain / formatted / long / with summary)</td><td>Titles, descriptions, body</td></tr>
+<tr><td>Number (integer, decimal, float)</td><td>Price, quantity</td></tr>
+<tr><td>Boolean</td><td>Yes/no flags (Featured)</td></tr>
+<tr><td>Date / Date range / Timestamp</td><td>Event dates</td></tr>
+<tr><td>List (text, integer, float)</td><td>Fixed options (select, radios, checkboxes)</td></tr>
+<tr><td>Link</td><td>URL with title</td></tr>
+<tr><td>Email, Telephone</td><td>Contact info</td></tr>
+<tr><td>Entity reference (Content, Taxonomy term, User, Media, File, Custom block)</td><td>Relationships between items</td></tr>
+<tr><td>Image / File</td><td>Direct uploads (media is preferred for reuse)</td></tr>
+<tr><td>Entity reference revisions</td><td>Used by Paragraphs (contrib)</td></tr>
+</table>
+
+<h2>4.3 How to create a content type (navigation)</h2>
+<ol>
+<li><b>Structure &rarr; Content types &rarr; Add content type</b> (<code>/admin/structure/types/add</code>).</li>
+<li>Name: Event. Description. In <b>Publishing options</b>: default published, create new revision. In <b>Display settings</b>: toggle "Display author and date information". In <b>Menu settings</b>: allowed menus. Save.</li>
+<li>Click <b>Manage fields</b> &rarr; <b>Create a new field</b> &rarr; choose type &rarr; set label &amp; machine name (<code>field_event_date</code>) &rarr; set storage settings (cannot change type later) &rarr; field settings (required, help text, default) &rarr; Save.</li>
+<li><b>Manage form display</b>: drag fields to reorder; choose widget (Date picker, Autocomplete, Select list, Check boxes/radios, Media library).</li>
+<li><b>Manage display</b>: choose formatter, label position (above, inline, hidden), and which fields appear in <b>Default</b>, <b>Teaser</b>, other view modes. Use "Custom display settings" at the bottom to enable more view modes for that bundle.</li>
+</ol>
+<div class="box warn"><b>Gotcha:</b> The field machine name and type are permanent. Plan names before saving. Deleting a field deletes its data.</div>
+
+<h2>4.4 Entity reference settings</h2>
+<ul>
+<li><b>Reference type</b>: what is referenced (Content, Taxonomy term, User, Media).</li>
+<li><b>Reference method</b>: Default (choose bundles, sort) or View (use a Views display to filter choices).</li>
+<li><b>Create referenced entities if they don't already exist</b>: lets editors add new terms on the fly with autocomplete (tags).</li>
+<li><b>Allowed number of values</b>: Limited (1, 2...), or Unlimited.</li>
+</ul>
+
+<h2>4.5 View modes and form modes</h2>
+<ul>
+<li><b>View mode</b>: output variant (full, teaser, search result, card). Create new ones at <b>Structure &rarr; Display modes &rarr; View modes</b> (<code>/admin/structure/display-modes/view</code>).</li>
+<li><b>Form mode</b>: edit form variant. <b>Structure &rarr; Display modes &rarr; Form modes</b>.</li>
+</ul>
+<p>Use a view mode when you need the same content shown differently in different places (a list card vs a full page). In a View, choose "Show: Content" with a view mode, or "Fields".</p>
+
+<h2>4.6 Revisions, moderation, status</h2>
+<ul>
+<li><b>Revisions</b>: every save can create a new version (the "Revisions" tab on a node). You can revert.</li>
+<li><b>Content Moderation</b> (core module) and <b>Workflows</b> (core): draft &rarr; review &rarr; published states. Enable both modules, then go to <b>Configuration &rarr; Workflow &rarr; Workflows</b> (<code>/admin/config/workflow/workflows</code>), edit "Editorial", and attach it to the Event content type.</li>
+<li><b>Published</b> flag: unpublished nodes are visible only to users with the right permission.</li>
+</ul>
+
+<h2>4.7 URL aliases</h2>
+<ul>
+<li>Every node has a system path <code>/node/5</code>. An <b>alias</b> like <code>/events/my-concert</code> is nicer.</li>
+<li>Manual: node edit form &rarr; <b>URL alias</b> panel. Automatic: <b>Pathauto</b> module, pattern <code>/events/[node:title]</code> at <code>/admin/config/search/path/patterns</code>.</li>
+</ul>
+
+<h2>Exercise 4.1 &mdash; Event content type</h2>
+<div class="box ex"><b>Task:</b> Create content type <b>Event</b> with: Date range (<code>field_event_date</code>), Location (plain text, <code>field_location</code>), Featured (boolean, <code>field_featured</code>), Category (taxonomy reference to vocabulary "Event category", multiple values), Image (media reference). Create 3 events. Make the Teaser show only title and image. Add a Pathauto pattern <code>/events/[node:title]</code>.</div>
+<div class="box ans"><b>Answer (steps):</b>
+<ol>
+<li>Install pathauto (Exercise 2.1). Create vocabulary first: <b>Structure &rarr; Taxonomy &rarr; Add vocabulary</b> "Event category"; add terms Music, Tech, Sports.</li>
+<li><b>Structure &rarr; Content types &rarr; Add content type</b> "Event". Save and go to Manage fields.</li>
+<li>Add fields: Date &rarr; "Date range" (<code>event_date</code>); Text (plain) &rarr; <code>location</code>; Boolean &rarr; <code>featured</code>; Reference &rarr; Taxonomy term &rarr; <code>category</code> (choose vocabulary, unlimited); Reference &rarr; Media &rarr; <code>image</code> (Image media type).</li>
+<li><b>Manage display</b> &rarr; scroll to "Custom display settings" &rarr; ensure Teaser is checked &rarr; open the Teaser tab &rarr; hide all except title (the title is shown by the node template) and Image (formatter "Rendered entity" or an image style). Save.</li>
+<li><b>Configuration &rarr; Search and metadata &rarr; URL aliases &rarr; Patterns &rarr; Add</b>: Pattern type "Content", pattern <code>/events/[node:title]</code>, select bundle Event.</li>
+<li><b>Content &rarr; Add content &rarr; Event</b> three times.</li>
+</ol></div>
+
+<h1>5. Views</h1>
+<h2>5.1 Meaning</h2>
+<p><b>Views</b> is a query builder with a UI (in core). It builds a SQL query against entities, applies filters and sorts, and renders the result as a page, block, feed, or other display. </p>
+<div class="box"><b>Interview one-liner:</b> "Views lets site builders create lists and reports without writing SQL or PHP. You choose the base table, fields, filters, sorts, relationships and a display such as a page or block."</div>
+
+<h2>5.2 Views vocabulary</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>View</td><td>The saved configuration (a config entity).</td></tr>
+<tr><td>Display</td><td>An output of the view: Page, Block, Feed, Attachment, Embed, REST export, Entity reference.</td></tr>
+<tr><td>Format</td><td>The layout: Unformatted list, Table, Grid, HTML list, Responsive grid, Serializer.</td></tr>
+<tr><td>Row style</td><td>Whether rows show Fields or rendered Content (entity in a view mode).</td></tr>
+<tr><td>Fields</td><td>Columns of data.</td></tr>
+<tr><td>Filter criteria</td><td>Conditions applied to the query (fixed or exposed to visitors).</td></tr>
+<tr><td>Exposed filter</td><td>A filter shown as a form to the visitor.</td></tr>
+<tr><td>Sort criteria</td><td>ORDER BY, can also be exposed.</td></tr>
+<tr><td>Relationship</td><td>A JOIN to a related entity so you can use its fields (example: content &rarr; author).</td></tr>
+<tr><td>Contextual filter</td><td>A filter whose value comes from the URL or context (argument). Example: <code>/events/music</code>.</td></tr>
+<tr><td>Pager</td><td>Pagination (full, mini, "display a specified number", "display all").</td></tr>
+<tr><td>Header / Footer / Empty</td><td>Text or areas above, below, and when there are no results.</td></tr>
+<tr><td>Aggregation</td><td>GROUP BY with COUNT, SUM, etc.</td></tr>
+<tr><td>Rewrite results</td><td>Change a field's output using tokens like <code>{{ title }}</code>.</td></tr>
+<tr><td>Override</td><td>Setting applies to one display only, not "All displays".</td></tr>
+</table>
+
+<h2>5.3 Create a view (navigation)</h2>
+<ol>
+<li><b>Structure &rarr; Views &rarr; Add view</b> (<code>/admin/structure/views/add</code>).</li>
+<li>View name; Show: Content of type Event sorted by Newest first.</li>
+<li>Tick <b>Create a page</b>: title, path <code>events</code>, display format (Table or Grid of fields), items per page.</li>
+<li>Tick <b>Create a block</b> (optional): items 3.</li>
+<li><b>Save and edit</b>.</li>
+</ol>
+<h3>The editing screen</h3>
+<ul>
+<li>Top: displays list. Left column: Title, Format, Fields, Filter, Sort. Right: Advanced (contextual filters, relationships, exposed form, query settings, caching, header, footer, no results).</li>
+<li>Click <b>Add</b> next to Fields / Filter criteria / Sort criteria, search by name, tick it, <b>Add and configure</b>.</li>
+<li>The dropdown <b>For: All displays / This page (override)</b> decides scope. Choose carefully.</li>
+<li>Bottom <b>Preview</b>, with "Auto preview" ticked, shows results as you edit.</li>
+<li>Always click <b>Save</b>.</li>
+</ul>
+
+<h2>5.4 Exposed filter example (Category)</h2>
+<ol>
+<li>Filter criteria &rarr; Add &rarr; "Event: Category (field_category)" &rarr; Add and configure.</li>
+<li>Tick <b>Expose this filter to visitors</b>. Set "Filter type to expose": Dropdown. Label: Category. Tick "Limit list to selected items" optional.</li>
+<li>Apply. Exposed form settings: Advanced &rarr; Exposed form &rarr; Exposed form style "Basic", change "Submit button text" to "Search".</li>
+</ol>
+
+<h2>5.5 Contextual filter example (category in URL)</h2>
+<ol>
+<li>Advanced &rarr; Contextual filters &rarr; Add &rarr; "Content: Has taxonomy term ID".</li>
+<li>"When the filter value is NOT in the URL": Display all results / Hide view / Provide default value.</li>
+<li>"When the filter value IS in the URL": validation criteria "Taxonomy term" so a bad ID shows "page not found".</li>
+<li>Page path: <code>events/%</code>. Visiting <code>/events/3</code> filters by term 3.</li>
+</ol>
+
+<h2>5.6 Relationship example</h2>
+<p>Show event author name: Advanced &rarr; Relationships &rarr; Add &rarr; "Content author" &rarr; then add field "User: Name", choosing the relationship "author". Without a relationship, you can only use fields of the base entity.</p>
+
+<h2>5.7 Useful Views settings</h2>
+<ul>
+<li><b>Query settings &rarr; Disable SQL rewriting</b>: use rarely; it bypasses node access (security risk).</li>
+<li><b>Caching</b>: Tag based (default); Time based for heavy views. </li>
+<li><b>Access</b>: Permission or Role. Always set it on pages.</li>
+<li><b>Use AJAX</b>: updates the list without reloading the page.</li>
+<li><b>Show SQL query</b>: enable at <code>/admin/structure/views/settings</code> for debugging.</li>
+<li><b>Distinct</b>: removes duplicates (caused by multi-value fields in joins).</li>
+<li><b>Machine name / Path / Menu</b>: A page display can add itself to a menu (Menu: Normal menu entry).</li>
+<li><b>Contextual links</b> and <b>Field rewriting</b> let you control markup. </li>
+</ul>
+
+<h2>5.8 Common Views mistakes (interview-worthy)</h2>
+<ul>
+<li>Editing "All displays" when you meant only one display.</li>
+<li>Duplicate rows (multi-value fields, relationships) &rarr; fix with Distinct or aggregation.</li>
+<li>Forgetting Published = Yes filter, which shows unpublished content to editors in a public list.</li>
+<li>Forgetting that views cache: after a change that doesn't appear, check caching and clear caches.</li>
+</ul>
+
+<h2>Exercise 5.1 &mdash; Upcoming events view</h2>
+<div class="box ex"><b>Task:</b> Create a view "Upcoming events": page at <code>/events</code> as a table (Title linked, Date, Location, Image), only published Events whose date is today or later, sorted by date ascending, an exposed Category filter, "No events found" text, and a block with the next 3 events. Make a second page <code>/events/%</code> filtering by category ID.</div>
+<div class="box ans"><b>Answer (steps):</b>
+<ol>
+<li>Add view &rarr; Show Content of type Event &rarr; sort "Unsorted" (you will add your own) &rarr; Create a page, path <code>events</code>, display format Table of fields, 10 items &rarr; Create a block, 3 items &rarr; Save and edit.</li>
+<li>Fields: add Event date, Location, Image (Media), keep Title (check "Link to content").</li>
+<li>Filter criteria: keep Published (=Yes) and Content type = Event. Add "Event date (field_event_date)" &rarr; operator "Is greater than or equal to" &rarr; value type "An offset from the current time" &rarr; value <code>now</code> (use the start field). </li>
+<li>Sort criteria: add Event date ascending (use "For: All displays").</li>
+<li>Expose Category filter (5.4) &mdash; For: <b>This page (override)</b> so the block stays simple.</li>
+<li>Advanced &rarr; No results behavior &rarr; Add "Global: Text area" &rarr; "No events found."</li>
+<li>Block display: Pager &rarr; "Display a specified number of items | 3" (This block override). Footer &rarr; Add Global Text area with a link to <code>/events</code>.</li>
+<li>Contextual filter for term ID with path <code>events/%</code>: Duplicate the page display, change path to <code>events/%</code>, override contextual filters for this display only.</li>
+<li>Save. Test.</li>
+</ol></div>
+
+<h1>6. Taxonomy, menus, blocks, media</h1>
+<h2>6.1 Taxonomy</h2>
+<p><b>Meaning:</b> a classification system. A <b>vocabulary</b> contains <b>terms</b>. Terms can be hierarchical.</p>
+<ul>
+<li><b>Create:</b> Structure &rarr; Taxonomy &rarr; Add vocabulary &rarr; Add terms.</li>
+<li><b>Hierarchy:</b> List terms tab &rarr; drag a term under another.</li>
+<li><b>Use:</b> add a Reference &rarr; Taxonomy term field to a content type (widgets: autocomplete (tags style), select, check boxes/radios).</li>
+<li>Term pages at <code>/taxonomy/term/ID</code> come from the core view "Taxonomy term".</li>
+<li><b>Tags vs categories:</b> tags are free-form (autocomplete with create-on-the-fly); categories are a controlled list.</li>
+</ul>
+
+<h2>6.2 Menus</h2>
+<ul>
+<li>Core menus: Main navigation, Footer, Administration, Tools, User account.</li>
+<li><b>Add a link:</b> Structure &rarr; Menus &rarr; Main navigation &rarr; Add link: Title, Link (<code>/events</code> or start typing a title), Enabled, Show as expanded, Parent, Weight.</li>
+<li><b>From a node:</b> Node edit form &rarr; Menu settings &rarr; Provide a menu link.</li>
+<li><b>Display:</b> a menu is only visible after its block is placed (6.3).</li>
+<li>Menu links can be defined in code with <code>*.links.menu.yml</code>.</li>
+</ul>
+
+<h2>6.3 Blocks and regions</h2>
+<ul>
+<li><b>Place a block:</b> Structure &rarr; Block layout &rarr; choose the theme tab &rarr; <b>Place block</b> next to a region &rarr; pick block &rarr; configure title, <b>Visibility</b> (pages, content types, roles, languages) &rarr; Save &rarr; Save blocks.</li>
+<li><b>Custom block (block content):</b> Content &rarr; Blocks &rarr; Add content block (e.g. "Basic block" with Body). Reusable blocks can be placed multiple times. Non-reusable ones belong to a single place (Layout Builder).</li>
+<li><b>Block types:</b> Structure &rarr; Block content types, to add fields to custom blocks.</li>
+<li><b>Views blocks</b> appear in the block list as "Views: &lt;view name&gt;".</li>
+<li><b>Layout Builder</b> (core): per-content-type or per-node drag-and-drop layouts. Enable <code>layout_builder</code> and <code>layout_discovery</code>. Then Manage display &rarr; tick "Use Layout Builder".</li>
+</ul>
+
+<h2>6.4 Media</h2>
+<ul>
+<li>Enable <b>Media</b> and <b>Media Library</b> modules (default in Standard profile).</li>
+<li><b>Media types:</b> Structure &rarr; Media types (Image, Document, Audio, Video, Remote video). Each is a bundle with source field and extra fields (alt, caption).</li>
+<li><b>Add media:</b> Content &rarr; Media &rarr; Add media.</li>
+<li><b>Use:</b> Add a "Media" reference field; widget "Media library".</li>
+<li><b>Image styles:</b> Configuration &rarr; Media &rarr; Image styles. Define scale/crop/convert (e.g. 400x300 WebP) and select it in the formatter. Responsive image styles give srcset.</li>
+</ul>
+
+<h2>6.5 Text formats and CKEditor 5</h2>
+<ul>
+<li>Configuration &rarr; Content authoring &rarr; Text formats and editors.</li>
+<li><b>Basic HTML</b>, <b>Restricted HTML</b> (no editor, anonymous users), <b>Full HTML</b> (trusted roles only).</li>
+<li>Each format has an editor toolbar and an allowed-HTML filter. A security rule: never give anonymous users Full HTML.</li>
+</ul>
+
+<h2>Exercise 6.1</h2>
+<div class="box ex"><b>Task:</b> (1) Add "Events" to the main menu. (2) Make Tech a child of a "Topics" term. (3) Create a custom block "Welcome" and show it only on the front page, in the sidebar. (4) Create an image style "Event card" (scale and crop 400x300, WebP) and use it for the Event image in Teaser.</div>
+<div class="box ans"><b>Answer:</b>
+<ol>
+<li>Structure &rarr; Menus &rarr; Main navigation &rarr; Add link, title Events, link <code>/events</code>, Save.</li>
+<li>Structure &rarr; Taxonomy &rarr; Event category &rarr; List terms &rarr; drag Tech to the right under the parent term.</li>
+<li>Content &rarr; Blocks &rarr; Add content block &rarr; Basic block, "Welcome" &rarr; Save. Structure &rarr; Block layout &rarr; Place block in Sidebar &rarr; Visibility &rarr; Pages &rarr; <code>&lt;front&gt;</code> &rarr; "Show for the listed pages".</li>
+<li>Configuration &rarr; Media &rarr; Image styles &rarr; Add &rarr; "event_card" &rarr; Add effect "Scale and crop" 400x300, Add effect "Convert" webp &rarr; Create. Then Manage display &rarr; Teaser &rarr; Image field formatter &rarr; choose the style.</li>
+</ol></div>
+
+<h1>7. Users, roles, permissions</h1>
+<h2>7.1 Meaning</h2>
+<ul>
+<li><b>User</b> = an account (an entity). <b>User 1</b> (uid 1) bypasses all access checks.</li>
+<li><b>Role</b> = a set of permissions. Built-in: <b>Anonymous</b>, <b>Authenticated</b> (every logged-in user inherits it), and <b>Administrator</b>.</li>
+<li><b>Permission</b> = a single allowed action, provided by modules (e.g. "Event: Create new content").</li>
+</ul>
+<div class="box"><b>Interview one-liner:</b> "Permissions are granted to roles, and roles are assigned to users, never permissions directly to users. Anonymous and Authenticated are separate built-in roles: a logged-in user does not inherit the Anonymous role's permissions, only Authenticated plus any extra roles assigned."</div>
+
+<h2>7.2 Navigation</h2>
+<ul>
+<li><b>Add role:</b> People &rarr; Roles &rarr; Add role (<code>/admin/people/roles/add</code>).</li>
+<li><b>Permissions grid:</b> People &rarr; Permissions (<code>/admin/people/permissions</code>) or per role (<code>/admin/people/permissions/ROLE</code>).</li>
+<li><b>Add user:</b> People &rarr; Add user. Assign roles on the form.</li>
+<li><b>Registration settings:</b> Configuration &rarr; People &rarr; Account settings. Choose "Administrators only", "Visitors", or "Visitors, but administrator approval is required".</li>
+<li><b>Blocking:</b> edit a user &rarr; Status: Blocked. Cancel account options exist in the same form.</li>
+</ul>
+
+<h2>7.3 Node access vs permissions</h2>
+<p>Permissions are global ("can edit any Event"). <b>Node access</b> (grants) adds per-node rules (private content, Content Access/Group modules). Views applies node access automatically (that is why "Disable SQL rewriting" is dangerous).</p>
+
+<h2>7.4 Access in code (preview of Chapter 11)</h2>
+<pre><code>requirements:
+  _permission: 'access content'     # in routing.yml
+requirements:
+  _role: 'editor'
+requirements:
+  _entity_access: 'node.view'
+requirements:
+  _custom_access: '\Drupal\mymod\Access\Foo::access'</code></pre>
+
+<h2>Exercise 7.1</h2>
+<div class="box ex"><b>Task:</b> Create a role "Editor" that can create/edit own Events and see unpublished content but cannot administer anything. Create user "editor1" with that role and test in a private window.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush role:create editor "Editor"
+ddev drush role:perm:add editor "access content overview,create event content,edit own event content,delete own event content,view own unpublished content,access toolbar"
+ddev drush user:create editor1 --mail="e1@example.com" --password="Pass123!"
+ddev drush user:role:add editor editor1</code></pre>
+Or in the UI: People &rarr; Roles &rarr; Add role "Editor" &rarr; Permissions grid &rarr; tick the Event rows &rarr; Save. People &rarr; Add user &rarr; assign Editor. Open a private window, log in as editor1, visit <code>/node/add/event</code> (allowed) and <code>/admin/structure</code> (Access denied).</div>
+
+<h1>8. Modules, themes, configuration management, recipes</h1>
+<h2>8.1 Install modules and themes</h2>
+<pre><code>ddev composer require drupal/admin_toolbar drupal/gin drupal/gin_toolbar
+ddev drush en admin_toolbar admin_toolbar_tools gin_toolbar -y
+ddev drush theme:install gin -y
+ddev drush config:set system.theme admin gin -y
+ddev drush cr</code></pre>
+<p>UI: <b>Extend</b> &rarr; tick module &rarr; Install. <b>Appearance</b> &rarr; Install, then "Set as default". Admin theme: <code>/admin/appearance</code> bottom "Administration theme".</p>
+<p><b>Core vs contrib vs custom:</b> core ships with Drupal; contrib is on drupal.org (Composer, <code>drupal/name</code>); custom is yours.</p>
+
+<h2>8.2 Update workflow (know this by heart)</h2>
+<ol>
+<li>Back up: <code>ddev drush sql:dump &gt; before.sql</code> or <code>ddev snapshot</code>.</li>
+<li>Check: <code>ddev composer outdated "drupal/*"</code>, and <b>Reports &rarr; Available updates</b>.</li>
+<li>Update: <code>ddev composer update "drupal/core-*" --with-all-dependencies</code> (or a single module).</li>
+<li><code>ddev drush updb -y</code> (database updates).</li>
+<li><code>ddev drush cim -y</code> if config changed; <code>ddev drush cr</code>.</li>
+<li>Test; commit composer.json, composer.lock, and config.</li>
+</ol>
+
+<h2>8.3 Configuration management (CMI)</h2>
+<p><b>Meaning:</b> A system that stores site configuration in the database but allows export/import as YAML files so changes move from development &rarr; staging &rarr; production under version control.</p>
+<h3>Setup</h3>
+<p>In <code>web/sites/default/settings.php</code>:</p>
+<pre><code>$settings['config_sync_directory'] = '../config/sync';</code></pre>
+<h3>Workflow</h3>
+<pre><code>ddev drush cex -y      # export DB config to config/sync/*.yml
+git add config/ && git commit -m "Add Event content type"
+# on another environment
+git pull && ddev composer install
+ddev drush updb -y
+ddev drush cim -y      # import YAML into DB
+ddev drush cr
+ddev drush config:status   # show differences</code></pre>
+<h3>Related commands</h3>
+<table>
+<tr><th>Command</th><th>Use</th></tr>
+<tr><td><code>drush config:get system.site</code></td><td>Read one config object</td></tr>
+<tr><td><code>drush config:set system.site name "My Site" -y</code></td><td>Change one value</td></tr>
+<tr><td><code>drush config:status</code></td><td>List differences between DB and files</td></tr>
+<tr><td><code>drush config:delete name</code></td><td>Delete a config object</td></tr>
+<tr><td><code>drush config:export --diff</code></td><td>Preview before export</td></tr>
+</table>
+<h3>Key facts for interviews</h3>
+<ul>
+<li>Config files live in <code>config/sync</code>; the site <b>UUID</b> must match between environments or import fails. Set once: <code>drush config:set system.site uuid XXXX</code> (only for a fresh site cloned from the same codebase).</li>
+<li><b>Config Split</b> (contrib) keeps environment-specific config (dev modules like devel, stage_file_proxy) separate.</li>
+<li><b>Config Ignore</b> (contrib) excludes config you do not want overwritten.</li>
+<li><b>Config overrides</b> in <code>settings.php</code> via <code>$config['system.site']['name'] = 'X';</code> never appear in the UI or export.</li>
+<li><b>Active config</b> = in DB; <b>sync directory</b> = YAML files. Config is not content, so nodes, users, terms are not exported.</li>
+<li><b>Default config</b> in modules sits in <code>config/install</code> (imported on module install) and <code>config/optional</code> (imported if dependencies exist). <code>config/schema/*.schema.yml</code> describes the structure of config.</li>
+</ul>
+
+<h2>8.4 Recipes (new in Drupal 10.3+, standard in 11)</h2>
+<p><b>Meaning:</b> A recipe is a reusable, composable package that applies config, installs modules, and can add content. It is applied once; it is not an ongoing dependency like a module.</p>
+<pre><code>ddev composer require drupal/drupal_cms_blog     # example recipe package
+ddev drush recipe ../recipes/drupal_cms_blog     # apply via Drush
+# or without Drush
+ddev exec php core/scripts/drupal recipe ../recipes/my_recipe</code></pre>
+<p>A recipe has <code>recipe.yml</code> with <code>name</code>, <code>type</code>, <code>recipes:</code>, <code>install:</code>, and <code>config:</code> sections (<code>config: import:</code> and <code>actions:</code>). Recipes live in the <code>recipes/</code> folder you already have.</p>
+<div class="box"><b>Recipe vs install profile vs module:</b> a profile is chosen once at install and lives for the site's lifetime; a module is ongoing code; a recipe runs once to configure the site.</div>
+
+<h2>8.5 Project template files</h2>
+<ul>
+<li><code>*.info.yml</code> describes a module/theme (name, type, core_version_requirement, dependencies).</li>
+<li><code>*.libraries.yml</code> declares CSS/JS bundles (asset libraries).</li>
+<li><code>*.routing.yml</code>, <code>*.services.yml</code>, <code>*.permissions.yml</code>, <code>*.links.menu.yml</code>, <code>*.links.task.yml</code>, <code>*.links.action.yml</code>, <code>*.module</code>, <code>*.install</code>.</li>
+</ul>
+
+<h2>Exercise 8.1</h2>
+<div class="box ex"><b>Task:</b> Export your Event content type to code, then delete the content type in the UI, and restore it by importing.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code># 1 set path in settings.php: $settings['config_sync_directory'] = '../config/sync';
+ddev drush cex -y
+ls config/sync | grep event          # field.storage.node.field_*, node.type.event, ...
+# 2 delete content type in UI (Structure > Content types > Event > Delete) - first delete event nodes
+# 3 restore
+ddev drush cim -y
+ddev drush cr</code></pre>
+The content type and its fields reappear, but the deleted event nodes do not (content is not config).</div>
+
+
+<h1>9. Popular contributed modules and site-building tools</h1>
+<p>Interviewers ask "which modules do you use and why?". Learn the purpose of each, and how to install: <code>ddev composer require drupal/NAME &amp;&amp; ddev drush en NAME -y</code>.</p>
+<table>
+<tr><th>Module</th><th>Purpose / when to use</th></tr>
+<tr><td><b>Pathauto</b> (+ Token)</td><td>Auto-generate URL aliases from patterns. Use on every content site for SEO-friendly URLs.</td></tr>
+<tr><td><b>Admin Toolbar</b></td><td>Dropdown admin menu for faster navigation.</td></tr>
+<tr><td><b>Gin</b> (+ Gin Toolbar)</td><td>Modern admin theme.</td></tr>
+<tr><td><b>Paragraphs</b></td><td>Flexible page building: editors stack reusable components (text, image, slider) inside a field.</td></tr>
+<tr><td><b>Webform</b></td><td>Forms, surveys, submissions, emails, exports. Use for contact/registration forms.</td></tr>
+<tr><td><b>Metatag</b></td><td>Meta tags and Open Graph for SEO and social sharing.</td></tr>
+<tr><td><b>Redirect</b></td><td>301 redirects and automatic redirect when an alias changes.</td></tr>
+<tr><td><b>Simple XML Sitemap</b></td><td>Generates sitemap.xml.</td></tr>
+<tr><td><b>Devel</b></td><td>Debug helpers, generate dummy content (<code>drush devel-generate:content 20</code>). Dev environments only.</td></tr>
+<tr><td><b>Views Bulk Operations (VBO)</b></td><td>Bulk actions on view rows.</td></tr>
+<tr><td><b>Config Split / Config Ignore</b></td><td>Environment-specific configuration.</td></tr>
+<tr><td><b>Search API</b> (+ Solr/Database backend)</td><td>Full-text search with facets.</td></tr>
+<tr><td><b>Facets</b></td><td>Faceted filtering on search results.</td></tr>
+<tr><td><b>Token</b></td><td>Placeholders like <code>[node:title]</code> used by Pathauto, Metatag, Webform.</td></tr>
+<tr><td><b>Entity Reference Revisions</b></td><td>Needed by Paragraphs.</td></tr>
+<tr><td><b>Group</b> / <b>Content Access</b></td><td>Per-group or per-node access control.</td></tr>
+<tr><td><b>Easy Breadcrumb</b></td><td>Better breadcrumbs.</td></tr>
+<tr><td><b>Honeypot / reCAPTCHA / Antibot</b></td><td>Spam protection for forms.</td></tr>
+<tr><td><b>Upgrade Status</b></td><td>Checks readiness for the next major Drupal version.</td></tr>
+<tr><td><b>Key / Encrypt</b></td><td>Safe storage of secrets.</td></tr>
+<tr><td><b>Scheduler</b></td><td>Schedule publish/unpublish.</td></tr>
+<tr><td><b>Redis / Memcache</b></td><td>External cache backends.</td></tr>
+<tr><td><b>Stage File Proxy</b></td><td>Load missing files from production on local sites.</td></tr>
+<tr><td><b>Automatic Updates / Project Browser</b></td><td>Browse and install modules from the UI (Project Browser) and automated secure core updates.</td></tr>
+</table>
+<h3>Key core modules to know</h3>
+<table>
+<tr><th>Core module</th><th>Meaning</th></tr>
+<tr><td>Views, Views UI</td><td>Lists and reports</td></tr>
+<tr><td>Field, Field UI</td><td>Fields and their admin UI</td></tr>
+<tr><td>Layout Builder, Layout Discovery</td><td>Drag-and-drop layouts</td></tr>
+<tr><td>Media, Media Library</td><td>Reusable media</td></tr>
+<tr><td>Content Moderation, Workflows</td><td>Editorial states</td></tr>
+<tr><td>Language, Content Translation, Interface Translation, Configuration Translation</td><td>Multilingual</td></tr>
+<tr><td>JSON:API, REST, Serialization, Basic Auth</td><td>Web services and headless</td></tr>
+<tr><td>Migrate, Migrate Drupal</td><td>Data import</td></tr>
+<tr><td>Navigation</td><td>New left sidebar admin menu</td></tr>
+<tr><td>Help, Database Logging, Syslog</td><td>Docs and logs</td></tr>
+<tr><td>BigPipe, Dynamic Page Cache, Internal Page Cache</td><td>Performance</td></tr>
+<tr><td>Update Manager</td><td>Reports available updates</td></tr>
+<tr><td>CKEditor 5</td><td>Rich text editor</td></tr>
+<tr><td>Config, Config Translation</td><td>CMI UI</td></tr>
+<tr><td>Contextual, Toolbar, Shortcut</td><td>Editor conveniences</td></tr>
+<tr><td>Single Directory Components (SDC)</td><td>Component-based theming</td></tr>
+<tr><td>Workspaces</td><td>Stage content changes in an isolated workspace</td></tr>
+<tr><td>Datetime Range, Responsive Image, Block Content, Taxonomy, Path, Path Alias, Search, Statistics, Tour, History</td><td>Misc. site building</td></tr>
+</table>
+
+<h2>Exercise 9.1</h2>
+<div class="box ex"><b>Task:</b> Install Admin Toolbar, Paragraphs, Metatag and Webform. Create a contact form with name, email, message and an email to the admin.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev composer require drupal/admin_toolbar drupal/paragraphs drupal/metatag drupal/webform
+ddev drush en admin_toolbar admin_toolbar_tools paragraphs metatag webform webform_ui -y
+ddev drush cr</code></pre>
+Navigate: Structure &rarr; Webforms &rarr; Add webform (<code>/admin/structure/webform/add</code>) &rarr; title "Contact" &rarr; Build tab &rarr; Add element: Name (Text field), Email, Message (Text area) &rarr; Settings &rarr; Emails/Handlers &rarr; Add handler "Email" &rarr; To: admin email. Open <code>/form/contact</code> and submit. View submissions in the Results tab; check email at <code>ddev mailpit</code>.</div>
+
+<h1>10. Theming with Twig</h1>
+<h2>10.1 Meaning</h2>
+<p>A <b>theme</b> controls presentation: templates (Twig), styles (CSS), scripts (JS), and regions. Core themes in Drupal 11: <b>Olivero</b> (default front end), <b>Claro</b> (admin), <b>Stark</b> (bare, for learning), <b>Starterkit</b> (generator for new themes), <b>Stable9</b> (stable markup base). </p>
+<div class="box"><b>Interview one-liner:</b> "Themes use the Twig template engine. A theme declares regions and asset libraries in YAML, overrides core markup by copying a template to the theme, and uses preprocess functions to prepare variables."</div>
+
+<h2>10.2 Create a custom theme from Starterkit (the Drupal 11 way)</h2>
+<pre><code>ddev exec php core/scripts/drupal generate-theme my_theme --path themes/custom
+# result: web/themes/custom/my_theme/
+ddev drush theme:install my_theme -y
+ddev drush config:set system.theme default my_theme -y
+ddev drush cr</code></pre>
+<p>Starterkit copies a clean theme that does not depend on Olivero afterwards (it is "forked", no base-theme inheritance).</p>
+
+<h2>10.3 Theme file anatomy</h2>
+<pre><code>web/themes/custom/my_theme/
+  my_theme.info.yml        # name, type, base theme, regions, libraries
+  my_theme.libraries.yml   # asset libraries (css/js)
+  my_theme.theme           # preprocess functions (PHP)
+  css/style.css
+  js/app.js
+  templates/               # twig overrides
+    node--event--teaser.html.twig
+    page.html.twig
+  components/              # single directory components (SDC)
+  logo.svg, screenshot.png</code></pre>
+<h3>my_theme.info.yml</h3>
+<pre><code>name: My Theme
+type: theme
+description: Custom theme for training
+package: Custom
+core_version_requirement: ^11
+base theme: stable9        # or false to build everything yourself
+libraries:
+  - my_theme/global
+regions:
+  header: Header
+  primary_menu: Primary menu
+  content: Content
+  sidebar: Sidebar
+  footer: Footer</code></pre>
+<h3>my_theme.libraries.yml</h3>
+<pre><code>global:
+  css:
+    theme:
+      css/style.css: {}
+  js:
+    js/app.js: {}
+  dependencies:
+    - core/drupal
+    - core/once</code></pre>
+<p><b>Attach a library:</b> globally via <code>libraries:</code> in info.yml; in Twig: <code>{{ attach_library('my_theme/global') }}</code>; in PHP render array: <code>$build['#attached']['library'][] = 'my_theme/global';</code>.</p>
+
+<h2>10.4 Twig syntax (memorise)</h2>
+<table>
+<tr><th>Syntax</th><th>Meaning / example</th></tr>
+<tr><td><code>{{ var }}</code></td><td>Print a variable (auto-escaped, safe).</td></tr>
+<tr><td><code>{% if x %} ... {% endif %}</code></td><td>Logic; also <code>for</code>, <code>set</code>, <code>include</code>, <code>extends</code>, <code>block</code>.</td></tr>
+<tr><td><code>{# comment #}</code></td><td>Comment.</td></tr>
+<tr><td><code>{{ content.field_location }}</code></td><td>Render a field with its formatter.</td></tr>
+<tr><td><code>{{ content|without('field_image') }}</code></td><td>Render everything except a field.</td></tr>
+<tr><td><code>{{ label }}</code></td><td>Node title.</td></tr>
+<tr><td><code>{{ url }}</code></td><td>Node URL.</td></tr>
+<tr><td><code>{{ node.field_location.value }}</code></td><td>Raw value of a field.</td></tr>
+<tr><td><code>{{ 'Hello'|t }}</code></td><td>Translate a string.</td></tr>
+<tr><td><code>{{ path('entity.node.canonical', {'node': 1}) }}</code></td><td>URL from route name.</td></tr>
+<tr><td><code>{{ attributes.addClass('card') }}</code></td><td>Add a CSS class.</td></tr>
+<tr><td><code>{{ dump(var) }}</code></td><td>Debug (with Twig debug on).</td></tr>
+<tr><td><code>|raw</code></td><td>Output unescaped HTML. Avoid; XSS risk.</td></tr>
+<tr><td><code>{% include '@my_theme/partials/card.html.twig' with {title: label} %}</code></td><td>Include a partial.</td></tr>
+</table>
+
+<h2>10.5 Template suggestions and debugging</h2>
+<p>Drupal picks the most specific template name. Order for a teaser Event node:</p>
+<pre><code>node--event--teaser.html.twig
+node--event.html.twig
+node--teaser.html.twig
+node.html.twig</code></pre>
+<p>Naming rules: double dash <code>--</code> separates specificity levels; underscores in machine names turn into hyphens in file names.</p>
+<h3>Turn on Twig debug (dev only)</h3>
+<pre><code>cp web/sites/default/default.services.yml web/sites/default/services.yml
+# edit services.yml under twig.config:
+#   debug: true
+#   auto_reload: true
+#   cache: false
+ddev drush cr</code></pre>
+<p>View page source: HTML comments list "THEME DEBUG", "FILE NAME SUGGESTIONS" (the <code>x</code> marks the one in use), and "BEGIN OUTPUT from ...". Copy that core template into your theme's <code>templates/</code> and edit it.</p>
+<div class="box warn">Disable these settings on production. Twig cache off makes the site slow.</div>
+
+<h2>10.6 Preprocess functions</h2>
+<pre><code>// my_theme.theme
+function my_theme_preprocess_node(array &amp;$variables) {
+  $node = $variables['node'];
+  if ($node-&gt;bundle() === 'event') {
+    $variables['is_featured'] = (bool) $node-&gt;get('field_featured')-&gt;value;
+  }
+}
+function my_theme_preprocess_page(array &amp;$variables) {
+  $variables['year'] = date('Y');
+}
+function my_theme_theme_suggestions_page_alter(array &amp;$suggestions, array $variables) {
+  if ($node = \Drupal::routeMatch()-&gt;getParameter('node')) {
+    $suggestions[] = 'page__' . $node-&gt;bundle();
+  }
+}</code></pre>
+<p>Hook naming: <code>THEMENAME_preprocess_HOOK</code>. Clear cache after adding a new function (hook discovery is cached).</p>
+
+<h2>10.7 Single Directory Components (SDC)</h2>
+<p><b>Meaning:</b> A component bundles its Twig, CSS, JS, schema, and metadata in one folder. Stable since Drupal 10.3. Reusable and documented.</p>
+<pre><code>themes/custom/my_theme/components/card/
+  card.component.yml
+  card.twig
+  card.css
+  card.js        (optional)</code></pre>
+<pre><code># card.component.yml
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Card
+status: stable
+props:
+  type: object
+  properties:
+    title: { type: string, title: Title }
+slots:
+  body: { title: Body }</code></pre>
+<pre><code>{# card.twig #}
+&lt;article {{ attributes.addClass('card') }}&gt;
+  &lt;h3&gt;{{ title }}&lt;/h3&gt;
+  {% block body %}{{ body }}{% endblock %}
+&lt;/article&gt;</code></pre>
+<p>Use it in any template: <code>{{ include('my_theme:card', {title: label}) }}</code> or <code>{% embed 'my_theme:card' with {title: label} %}{% block body %}...{% endblock %}{% endembed %}</code>. CSS and JS are loaded automatically when the component is rendered.</p>
+
+<h2>10.8 Responsive images, breakpoints</h2>
+<ul>
+<li><code>my_theme.breakpoints.yml</code> defines breakpoints; the Responsive Image module maps them to image styles (<code>/admin/config/media/responsive-image-style</code>) to produce <code>srcset</code>.</li>
+<li>Lazy loading is enabled by default on images in core formatters (<code>loading="lazy"</code>).</li>
+</ul>
+
+<h2>10.9 Sub-theme vs Starterkit vs base theme</h2>
+<ul>
+<li><b>Sub-theme</b>: inherits templates/CSS from a base theme via <code>base theme:</code>. Updates to the base flow in.</li>
+<li><b>Starterkit</b>: a one-time generated copy. No inheritance; you own all the code.</li>
+<li><b>Admin theme</b>: used for admin pages; set at Appearance &rarr; Administration theme.</li>
+</ul>
+
+<h2>Exercise 10.1</h2>
+<div class="box ex"><b>Task:</b> Generate a theme "my_theme", make it default, add a footer with the current year, and override the Event teaser template to show title, date and location in a styled card (use the CSS file). </div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev exec php core/scripts/drupal generate-theme my_theme --path themes/custom
+ddev drush theme:install my_theme -y &amp;&amp; ddev drush config:set system.theme default my_theme -y</code></pre>
+<p>Create <code>templates/node--event--teaser.html.twig</code>:</p>
+<pre><code>{{ attach_library('my_theme/global') }}
+&lt;article{{ attributes.addClass('event-card') }}&gt;
+  &lt;h2&gt;&lt;a href="{{ url }}"&gt;{{ label }}&lt;/a&gt;&lt;/h2&gt;
+  &lt;div class="event-card__date"&gt;{{ content.field_event_date }}&lt;/div&gt;
+  &lt;div class="event-card__place"&gt;{{ content.field_location }}&lt;/div&gt;
+&lt;/article&gt;</code></pre>
+<p>Add to <code>css/style.css</code>: <code>.event-card{border:1px solid #ddd;border-radius:8px;padding:1rem;margin-bottom:1rem}</code>. For the footer year, add the preprocess function from 10.6 and print <code>{{ year }}</code> in <code>page.html.twig</code>. Run <code>ddev drush cr</code> and view <code>/events</code> (the view must use "Content: Teaser" row style).</p></div>
+
+<h1>11. Custom module development</h1>
+<h2>11.1 Prerequisites you must know</h2>
+<ul>
+<li><b>PHP OOP:</b> classes, namespaces (<code>namespace Drupal\my_module\Controller;</code>), interfaces, inheritance, traits, constructor promotion, type declarations, attributes.</li>
+<li><b>PSR-4 autoloading:</b> <code>Drupal\my_module\Foo</code> maps to <code>web/modules/custom/my_module/src/Foo.php</code>.</li>
+<li><b>YAML</b> for configuration files.</li>
+</ul>
+
+<h2>11.2 Create the module</h2>
+<pre><code>ddev drush generate module     # interactive scaffold (Drush Generators)
+# or manually:
+mkdir -p web/modules/custom/training/src/Controller</code></pre>
+<p><code>training.info.yml</code>:</p>
+<pre><code>name: Training
+type: module
+description: Training examples.
+package: Custom
+core_version_requirement: ^11
+dependencies:
+  - drupal:node</code></pre>
+<pre><code>ddev drush en training -y</code></pre>
+
+<h2>11.3 Routing + Controller (a page)</h2>
+<p><code>training.routing.yml</code>:</p>
+<pre><code>training.hello:
+  path: '/hello/{name}'
+  defaults:
+    _controller: '\Drupal\training\Controller\HelloController::greet'
+    _title: 'Hello page'
+    name: 'World'
+  requirements:
+    _permission: 'access content'</code></pre>
+<p><code>src/Controller/HelloController.php</code>:</p>
+<pre><code>&lt;?php
+namespace Drupal\training\Controller;
+
+use Drupal\Core\Controller\ControllerBase;
+
+class HelloController extends ControllerBase {
+  public function greet(string $name): array {
+    return [
+      '#markup' =&gt; $this-&gt;t('Hello, @name!', ['@name' =&gt; $name]),
+    ];
+  }
+}</code></pre>
+<p>Visit <code>/hello/Sam</code> after <code>ddev drush cr</code>. Route parts: <b>path</b>, <b>defaults</b> (what runs), <b>requirements</b> (access), <b>options</b> (e.g. <code>_admin_route: TRUE</code>, parameter converters). <code>{name}</code> is a route parameter passed to the method by name.</p>
+<h3>Route access requirement options</h3>
+<pre><code>_permission: 'administer nodes'
+_role: 'editor'
+_user_is_logged_in: 'TRUE'
+_access: 'TRUE'                       # public
+_entity_access: 'node.update'         # with {node} param
+_custom_access: '\Drupal\training\Access\Check::access'</code></pre>
+
+<h2>11.4 Menu link, local task, action</h2>
+<pre><code># training.links.menu.yml
+training.hello_link:
+  title: 'Hello'
+  route_name: training.hello
+  menu_name: main
+  weight: 10
+
+# training.links.task.yml  (tabs)
+# training.links.action.yml (buttons like "+ Add")</code></pre>
+
+<h2>11.5 Permissions</h2>
+<pre><code># training.permissions.yml
+administer training settings:
+  title: 'Administer training settings'
+  description: 'Change training module settings.'
+  restrict access: true</code></pre>
+
+<h2>11.6 A custom Block plugin</h2>
+<pre><code>&lt;?php
+namespace Drupal\training\Plugin\Block;
+
+use Drupal\Core\Block\Attribute\Block;
+use Drupal\Core\Block\BlockBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+#[Block(
+  id: 'training_latest_events',
+  admin_label: new TranslatableMarkup('Latest events'),
+  category: new TranslatableMarkup('Training'),
+)]
+class LatestEventsBlock extends BlockBase {
+  public function build(): array {
+    return [
+      '#markup' =&gt; $this-&gt;t('Latest events go here'),
+      '#cache' =&gt; ['max-age' =&gt; 3600],
+    ];
+  }
+}</code></pre>
+<p>Place via Structure &rarr; Block layout &rarr; Place block &rarr; category Training. Older code uses docblock <code>@Block(...)</code> annotations; Drupal 11 prefers PHP attributes.</p>
+
+<h2>11.7 Form API</h2>
+<p>Form class extends <code>FormBase</code> (general) or <code>ConfigFormBase</code> (settings stored in config).</p>
+<pre><code>&lt;?php
+namespace Drupal\training\Form;
+
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
+
+class FeedbackForm extends FormBase {
+  public function getFormId(): string { return 'training_feedback'; }
+
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+    $form['name'] = ['#type' =&gt; 'textfield', '#title' =&gt; $this-&gt;t('Name'), '#required' =&gt; TRUE];
+    $form['email'] = ['#type' =&gt; 'email', '#title' =&gt; $this-&gt;t('Email')];
+    $form['msg'] = ['#type' =&gt; 'textarea', '#title' =&gt; $this-&gt;t('Message')];
+    $form['actions']['#type'] = 'actions';
+    $form['actions']['submit'] = ['#type' =&gt; 'submit', '#value' =&gt; $this-&gt;t('Send')];
+    return $form;
+  }
+
+  public function validateForm(array &amp;$form, FormStateInterface $form_state): void {
+    if (strlen($form_state-&gt;getValue('msg')) &lt; 10) {
+      $form_state-&gt;setErrorByName('msg', $this-&gt;t('Message too short.'));
+    }
+  }
+
+  public function submitForm(array &amp;$form, FormStateInterface $form_state): void {
+    $this-&gt;messenger()-&gt;addStatus($this-&gt;t('Thanks, @n!', ['@n' =&gt; $form_state-&gt;getValue('name')]));
+    $form_state-&gt;setRedirect('&lt;front&gt;');
+  }
+}</code></pre>
+<pre><code># routing
+training.feedback:
+  path: '/feedback'
+  defaults:
+    _form: '\Drupal\training\Form\FeedbackForm'
+    _title: 'Feedback'
+  requirements:
+    _permission: 'access content'</code></pre>
+<p><b>Form lifecycle:</b> build &rarr; (user submits) &rarr; validate &rarr; submit. Common elements: <code>textfield, textarea, email, number, select, radios, checkboxes, checkbox, date, datetime, entity_autocomplete, managed_file, hidden, markup, details, fieldset, container, submit</code>. Security: Drupal adds a CSRF token (<code>form_token</code>) automatically.</p>
+<h3>Config (settings) form</h3>
+<pre><code>class SettingsForm extends ConfigFormBase {
+  protected function getEditableConfigNames() { return ['training.settings']; }
+  public function getFormId() { return 'training_settings'; }
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $config = $this-&gt;config('training.settings');
+    $form['greeting'] = ['#type' =&gt; 'textfield', '#title' =&gt; 'Greeting',
+      '#default_value' =&gt; $config-&gt;get('greeting')];
+    return parent::buildForm($form, $form_state);
+  }
+  public function submitForm(array &amp;$form, FormStateInterface $form_state) {
+    $this-&gt;config('training.settings')-&gt;set('greeting', $form_state-&gt;getValue('greeting'))-&gt;save();
+    parent::submitForm($form, $form_state);
+  }
+}</code></pre>
+<p>Provide defaults in <code>config/install/training.settings.yml</code> and a schema in <code>config/schema/training.schema.yml</code>.</p>
+
+<h2>11.8 Render arrays</h2>
+<pre><code>$build = [
+  '#theme' =&gt; 'item_list',
+  '#items' =&gt; ['One', 'Two'],
+  '#cache' =&gt; ['tags' =&gt; ['node_list'], 'contexts' =&gt; ['user.permissions'], 'max-age' =&gt; 600],
+  '#attached' =&gt; ['library' =&gt; ['my_theme/global']],
+];
+$link = ['#type' =&gt; 'link', '#title' =&gt; 'Go', '#url' =&gt; \Drupal\Core\Url::fromRoute('&lt;front&gt;')];
+$table = ['#type' =&gt; 'table', '#header' =&gt; ['A','B'], '#rows' =&gt; [[1,2],[3,4]]];</code></pre>
+<p>Properties start with <code>#</code>. <code>#markup</code> is filtered (XSS-safe); <code>#plain_text</code> escapes everything; <code>#theme</code> uses a theme hook; <code>#type</code> uses a render element.</p>
+
+<h2>11.9 Translation and escaping</h2>
+<ul>
+<li><code>$this-&gt;t('Hello @name', ['@name' =&gt; $x])</code> &mdash; <code>@</code> escapes, <code>%</code> escapes and emphasises, <code>:</code> is for URLs. <b>Never</b> concatenate user input into <code>t()</code> strings.</li>
+<li>Use <code>StringTranslationTrait</code> in services.</li>
+</ul>
+
+<h2>11.10 Install / uninstall and update hooks</h2>
+<pre><code>// training.install
+function training_schema() {          // create a custom table
+  return ['training_log' =&gt; [
+    'fields' =&gt; ['id' =&gt; ['type' =&gt; 'serial', 'not null' =&gt; TRUE],
+                 'msg' =&gt; ['type' =&gt; 'varchar', 'length' =&gt; 255, 'not null' =&gt; TRUE]],
+    'primary key' =&gt; ['id'],
+  ]];
+}
+function training_update_10001() {    // run by drush updb
+  // change schema or data here
+}</code></pre>
+
+<h2>Exercise 11.1</h2>
+<div class="box ex"><b>Task:</b> Build module "training" with (a) page <code>/hello/{name}</code>, (b) a permission-protected page <code>/admin/training</code>, (c) a Latest Events block that lists the 3 latest published Event titles, (d) a feedback form.</div>
+<div class="box ans"><b>Answer:</b> Use sections 11.2 - 11.7. For (c) replace the block's <code>build()</code> with:
+<pre><code>public function build(): array {
+  $nids = \Drupal::entityQuery('node')
+    -&gt;accessCheck(TRUE)
+    -&gt;condition('type', 'event')
+    -&gt;condition('status', 1)
+    -&gt;sort('created', 'DESC')
+    -&gt;range(0, 3)
+    -&gt;execute();
+  $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+  $items = [];
+  foreach ($nodes as $node) { $items[] = $node-&gt;toLink(); }
+  return [
+    '#theme' =&gt; 'item_list', '#items' =&gt; $items,
+    '#cache' =&gt; ['tags' =&gt; ['node_list:event']],
+  ];
+}</code></pre>
+For (b): add a route <code>training.admin</code> with path <code>/admin/training</code>, <code>_permission: 'administer training settings'</code> and <code>_admin_route: TRUE</code> in options. Run <code>ddev drush en training -y &amp;&amp; ddev drush cr</code>.</div>
+
+
+<h1>12. Services, dependency injection, hooks, events, plugins</h1>
+<h2>12.1 Services and the container</h2>
+<p><b>Service</b> = a PHP object with one job (logger, mailer, database, current user, entity type manager). The <b>service container</b> creates them lazily and shares one instance. Services are declared in <code>MODULE.services.yml</code>.</p>
+<pre><code># training.services.yml
+services:
+  training.greeter:
+    class: Drupal\training\Greeter
+    arguments: ['@current_user', '@logger.factory', '@entity_type.manager']</code></pre>
+<pre><code>namespace Drupal\training;
+
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+
+class Greeter {
+  public function __construct(
+    protected AccountProxyInterface $currentUser,
+    protected LoggerChannelFactoryInterface $loggerFactory,
+  ) {}
+
+  public function greet(): string {
+    $this-&gt;loggerFactory-&gt;get('training')-&gt;info('Greeted @u', ['@u' =&gt; $this-&gt;currentUser-&gt;getDisplayName()]);
+    return 'Hello ' . $this-&gt;currentUser-&gt;getDisplayName();
+  }
+}</code></pre>
+<p>Autowiring is available (<code>autowire: true</code>) in Drupal 10.2+. You can also use <code>\Drupal::service('training.greeter')</code> in procedural code, but inside classes use <b>injection</b>.</p>
+<h3>Common services</h3>
+<table>
+<tr><th>Service id</th><th>What</th></tr>
+<tr><td><code>current_user</code></td><td>Logged-in user</td></tr>
+<tr><td><code>entity_type.manager</code></td><td>Load and query entities</td></tr>
+<tr><td><code>database</code></td><td>DB connection</td></tr>
+<tr><td><code>config.factory</code></td><td>Read/write config</td></tr>
+<tr><td><code>logger.factory</code></td><td>Logging</td></tr>
+<tr><td><code>messenger</code></td><td>Status messages</td></tr>
+<tr><td><code>cache.default</code></td><td>Cache bin</td></tr>
+<tr><td><code>state</code></td><td>Key-value, non-config state</td></tr>
+<tr><td><code>date.formatter</code></td><td>Format dates</td></tr>
+<tr><td><code>request_stack</code></td><td>Current request</td></tr>
+<tr><td><code>language_manager</code></td><td>Languages</td></tr>
+<tr><td><code>plugin.manager.mail</code> / <code>plugin.manager.queue_worker</code></td><td>Mail and queues</td></tr>
+<tr><td><code>file_system</code>, <code>file_url_generator</code></td><td>Files</td></tr>
+<tr><td><code>http_client</code></td><td>Guzzle HTTP client</td></tr>
+<tr><td><code>renderer</code></td><td>Render arrays to HTML</td></tr>
+<tr><td><code>module_handler</code></td><td>Invoke hooks, check modules</td></tr>
+</table>
+
+<h2>12.2 Dependency injection in controllers, forms, blocks</h2>
+<p>Classes that are created by Drupal (controller, plugin, form) use <code>ContainerInjectionInterface</code> or <code>ContainerFactoryPluginInterface</code> with a static <code>create()</code> factory:</p>
+<pre><code>use Symfony\Component\DependencyInjection\ContainerInterface;
+class HelloController extends ControllerBase {
+  public function __construct(protected Greeter $greeter) {}
+  public static function create(ContainerInterface $container): static {
+    return new static($container-&gt;get('training.greeter'));
+  }
+  public function greet(): array { return ['#markup' =&gt; $this-&gt;greeter-&gt;greet()]; }
+}</code></pre>
+<p><b>Why DI?</b> Testability (swap dependencies with mocks), loose coupling, and no hidden globals. <code>ControllerBase</code> already gives helpers like <code>$this-&gt;currentUser()</code>, <code>$this-&gt;entityTypeManager()</code>, <code>$this-&gt;config()</code>.</p>
+
+<h2>12.3 Hooks</h2>
+<p><b>Meaning:</b> A hook is a named extension point. Modules implement it to alter or add behavior.</p>
+<h3>Drupal 11 object-oriented hooks (use this style in new code)</h3>
+<pre><code>namespace Drupal\training\Hook;
+
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Entity\EntityInterface;
+
+class TrainingHooks {
+  #[Hook('node_presave')]
+  public function nodePresave(EntityInterface $entity): void {
+    if ($entity-&gt;bundle() === 'event' &amp;&amp; $entity-&gt;isNew()) {
+      $entity-&gt;setTitle(trim($entity-&gt;getTitle()));
+    }
+  }
+
+  #[Hook('form_alter')]
+  public function formAlter(array &amp;$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id): void {
+    if ($form_id === 'node_event_form') {
+      $form['title']['widget'][0]['value']['#description'] = t('Keep it short.');
+    }
+  }
+}</code></pre>
+<p>Classic procedural style still works: in <code>training.module</code> write <code>function training_node_presave($node) {...}</code>. After adding hooks run <code>drush cr</code>. Hooks classes sit in <code>src/Hook/</code>.</p>
+<h3>Hooks you must know</h3>
+<table>
+<tr><th>Hook</th><th>When / use</th></tr>
+<tr><td><code>hook_form_alter</code>, <code>hook_form_FORM_ID_alter</code></td><td>Change any form</td></tr>
+<tr><td><code>hook_entity_presave / insert / update / delete</code> (and <code>hook_node_*</code>)</td><td>React to entity save/delete</td></tr>
+<tr><td><code>hook_entity_view_alter</code>, <code>hook_node_view</code></td><td>Alter rendered output</td></tr>
+<tr><td><code>hook_theme</code></td><td>Register theme hooks / templates</td></tr>
+<tr><td><code>hook_preprocess_HOOK</code></td><td>Prepare Twig variables</td></tr>
+<tr><td><code>hook_theme_suggestions_HOOK_alter</code></td><td>Add template suggestions</td></tr>
+<tr><td><code>hook_menu_links_discovered_alter</code>, <code>hook_link_alter</code></td><td>Alter menus/links</td></tr>
+<tr><td><code>hook_cron</code></td><td>Periodic tasks</td></tr>
+<tr><td><code>hook_install / hook_uninstall / hook_update_N</code></td><td>Lifecycle</td></tr>
+<tr><td><code>hook_mail</code>, <code>hook_mail_alter</code></td><td>Email content</td></tr>
+<tr><td><code>hook_help</code></td><td>Help text</td></tr>
+<tr><td><code>hook_query_TAG_alter</code></td><td>Alter tagged DB queries</td></tr>
+<tr><td><code>hook_views_data</code>, <code>hook_views_pre_render</code>, <code>hook_views_query_alter</code></td><td>Views integration</td></tr>
+<tr><td><code>hook_node_access</code>, <code>hook_entity_access</code></td><td>Custom access logic</td></tr>
+<tr><td><code>hook_page_attachments</code></td><td>Attach libraries/meta to pages</td></tr>
+<tr><td><code>hook_library_info_alter</code></td><td>Modify libraries</td></tr>
+</table>
+
+<h2>12.4 Events (Symfony event subscribers)</h2>
+<p><b>Meaning:</b> Use events (from Symfony) for request/response lifecycle and for newer subsystems. Hooks vs events: hooks are Drupal-specific and discovered by name; events use a dispatcher and subscribers with priorities.</p>
+<pre><code># training.services.yml
+  training.redirect_subscriber:
+    class: Drupal\training\EventSubscriber\RedirectSubscriber
+    tags:
+      - { name: event_subscriber }</code></pre>
+<pre><code>namespace Drupal\training\EventSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class RedirectSubscriber implements EventSubscriberInterface {
+  public static function getSubscribedEvents(): array {
+    return [KernelEvents::REQUEST =&gt; ['onRequest', 30]];   // priority 30
+  }
+  public function onRequest(RequestEvent $event): void {
+    // e.g. redirect /old to /new
+  }
+}</code></pre>
+<p>Typical events: <code>KernelEvents::REQUEST / RESPONSE / EXCEPTION</code>, <code>RoutingEvents::ALTER</code>, <code>ConfigEvents::SAVE</code>.</p>
+
+<h2>12.5 Plugins</h2>
+<p><b>Meaning:</b> A plugin is a class that provides one implementation of a type of functionality. A <b>plugin type</b> has a <b>manager</b>, <b>discovery</b> (attributes / annotations / YAML), and optional <b>derivers</b>.</p>
+<table>
+<tr><th>Plugin type</th><th>Folder</th><th>Example</th></tr>
+<tr><td>Block</td><td><code>src/Plugin/Block</code></td><td>Latest events</td></tr>
+<tr><td>Field type / widget / formatter</td><td><code>src/Plugin/Field/...</code></td><td>Custom field</td></tr>
+<tr><td>QueueWorker</td><td><code>src/Plugin/QueueWorker</code></td><td>Background jobs</td></tr>
+<tr><td>Action</td><td><code>src/Plugin/Action</code></td><td>Bulk actions</td></tr>
+<tr><td>Views field / filter / argument</td><td><code>src/Plugin/views/...</code></td><td>Custom view parts</td></tr>
+<tr><td>Migrate source/process/destination</td><td><code>src/Plugin/migrate/...</code></td><td>Import logic</td></tr>
+<tr><td>Condition</td><td><code>src/Plugin/Condition</code></td><td>Block visibility</td></tr>
+<tr><td>Filter</td><td><code>src/Plugin/Filter</code></td><td>Text format filter</td></tr>
+<tr><td>Constraint</td><td><code>src/Plugin/Validation/Constraint</code></td><td>Entity validation</td></tr>
+</table>
+<p><b>Annotations vs attributes:</b> annotations (<code>@Block</code>) are docblock based and still supported; attributes (<code>#[Block]</code>) are the modern PHP 8 way and recommended for new Drupal 11 code.</p>
+
+<h2>12.6 Queue example (background work)</h2>
+<pre><code>#[QueueWorker(id: 'training_email', title: new TranslatableMarkup('Send emails'), cron: ['time' =&gt; 30])]
+class EmailWorker extends QueueWorkerBase {
+  public function processItem($data) { /* send mail for $data */ }
+}
+// add to the queue
+\Drupal::queue('training_email')-&gt;createItem(['uid' =&gt; 5]);</code></pre>
+<p>Run: <code>drush queue:list</code>, <code>drush queue:run training_email</code>.</p>
+
+<h2>Exercise 12.1</h2>
+<div class="box ex"><b>Task:</b> (a) Create a service <code>training.greeter</code>. (b) Inject it into a controller. (c) Add a <code>form_alter</code> hook that adds a description on the Event node form. (d) Log a message when an Event is saved.</div>
+<div class="box ans"><b>Answer:</b> Follow 12.1 for the service and 12.2 for the controller. For (c) use the <code>#[Hook('form_alter')]</code> sample. For (d):
+<pre><code>#[Hook('node_insert')]
+public function nodeInsert(\Drupal\node\NodeInterface $node): void {
+  if ($node-&gt;bundle() === 'event') {
+    \Drupal::logger('training')-&gt;notice('Event created: @t', ['@t' =&gt; $node-&gt;label()]);
+  }
+}</code></pre>
+Check <code>/admin/reports/dblog</code> or <code>ddev drush ws --type=training</code>. The module must be enabled and caches cleared.</div>
+
+<h1>13. Entity API, database API, config API, state, cache, queue, cron</h1>
+<h2>13.1 Entity API</h2>
+<p><b>Entity types:</b> content entities (node, user, taxonomy_term, media, file, comment, block_content, paragraph) are fieldable and stored in tables; config entities (view, node_type, field_config, role, image_style) are stored in config.</p>
+<pre><code>use Drupal\node\Entity\Node;
+
+// create
+$node = Node::create([
+  'type' =&gt; 'event',
+  'title' =&gt; 'Drupal Meetup',
+  'field_location' =&gt; 'Hyderabad',
+  'status' =&gt; 1,
+]);
+$node-&gt;save();
+
+// load
+$node = Node::load(5);
+$nodes = \Drupal::entityTypeManager()-&gt;getStorage('node')-&gt;loadMultiple([1, 2]);
+
+// read/write fields
+$title = $node-&gt;label();
+$loc = $node-&gt;get('field_location')-&gt;value;
+$node-&gt;set('field_location', 'Pune')-&gt;save();
+$term = $node-&gt;get('field_category')-&gt;entity;         // referenced entity
+$ids = array_column($node-&gt;get('field_category')-&gt;getValue(), 'target_id');
+
+// delete
+$node-&gt;delete();
+
+// entity query
+$ids = \Drupal::entityQuery('node')
+  -&gt;accessCheck(TRUE)
+  -&gt;condition('type', 'event')
+  -&gt;condition('field_featured', 1)
+  -&gt;sort('created', 'DESC')
+  -&gt;range(0, 10)
+  -&gt;execute();</code></pre>
+<div class="box warn"><b>Always call <code>accessCheck(TRUE|FALSE)</code></b> on entity queries (required since Drupal 10). Use TRUE for user-facing output.</div>
+<h3>Entity concepts for interviews</h3>
+<ul>
+<li><b>Entity type</b> (definition class with handlers: storage, view builder, access, list builder, forms, route provider); <b>bundle</b>; <b>fields</b>: base fields (code-defined, e.g. title) vs configurable fields (UI-defined).</li>
+<li><b>Revisions</b> and <b>translations</b> are built into content entities.</li>
+<li><b>Custom entity</b>: define with the <code>#[ContentEntityType]</code> attribute, an interface, schema via base field definitions, and handlers. Scaffold with <code>drush generate entity:content</code>. Update schema changes with <code>hook_update_N</code> and <code>EntityDefinitionUpdateManager</code>.</li>
+<li><b>Entity access</b>: <code>$entity-&gt;access('update', $account)</code>.</li>
+<li><b>Typed data / field items</b>: <code>$node-&gt;field_x</code> is a <code>FieldItemList</code> of <code>FieldItem</code>s.</li>
+</ul>
+
+<h2>13.2 Database API</h2>
+<pre><code>$database = \Drupal::database();
+
+// select
+$result = $database-&gt;select('node_field_data', 'n')
+  -&gt;fields('n', ['nid', 'title'])
+  -&gt;condition('n.type', 'event')
+  -&gt;condition('n.status', 1)
+  -&gt;orderBy('n.created', 'DESC')
+  -&gt;range(0, 5)
+  -&gt;execute();
+foreach ($result as $row) { echo $row-&gt;title; }
+
+// insert / update / delete
+$database-&gt;insert('training_log')-&gt;fields(['msg' =&gt; 'Hi'])-&gt;execute();
+$database-&gt;update('training_log')-&gt;fields(['msg' =&gt; 'Bye'])-&gt;condition('id', 1)-&gt;execute();
+$database-&gt;delete('training_log')-&gt;condition('id', 1)-&gt;execute();
+
+// transaction
+$tx = $database-&gt;startTransaction();   // rolls back when $tx goes out of scope on exception</code></pre>
+<div class="box warn"><b>Never</b> concatenate user input into SQL. Use placeholders (<code>:name</code>) or the query builder; this prevents SQL injection.</div>
+<p><b>Entity query vs DB query:</b> use entity query for entity IDs with access/field abstraction; use the DB API for custom tables or performance-critical aggregates.</p>
+
+<h2>13.3 Configuration API</h2>
+<pre><code>$config = \Drupal::config('system.site');           // read only
+$name = $config-&gt;get('name');
+$editable = \Drupal::configFactory()-&gt;getEditable('training.settings');
+$editable-&gt;set('greeting', 'Hi')-&gt;save();</code></pre>
+<p><b>Simple config</b> (a single object like <code>system.site</code>) vs <b>config entities</b> (many, like views). Schema in <code>config/schema</code> is required, or you get "missing schema" errors in tests.</p>
+
+<h2>13.4 State API, key/value, settings</h2>
+<ul>
+<li><b>State</b>: <code>\Drupal::state()-&gt;set('training.last_run', time());</code> &mdash; environment-specific values not exported (last cron time).</li>
+<li><b>Key-value store</b>: general storage <code>keyvalue</code> / <code>keyvalue.expirable</code>.</li>
+<li><b>Settings</b> (<code>settings.php</code>): <code>\Drupal\Core\Site\Settings::get('hash_salt')</code> &mdash; credentials and server-specific values.</li>
+<li><b>Rule:</b> editors change it &rarr; config; code/environment sets it &rarr; settings; runtime-only memory &rarr; state; user-generated data &rarr; entity.</li>
+</ul>
+
+<h2>13.5 Cache API</h2>
+<pre><code>$cid = 'training:feed';
+if ($cache = \Drupal::cache()-&gt;get($cid)) { $data = $cache-&gt;data; }
+else {
+  $data = expensive();
+  \Drupal::cache()-&gt;set($cid, $data, time() + 3600, ['node_list']);   // expire + tags
+}
+\Drupal\Core\Cache\Cache::invalidateTags(['node_list']);</code></pre>
+<p>Details in Chapter 15.</p>
+
+<h2>13.6 Cron</h2>
+<ul>
+<li>Cron runs periodic tasks (clear caches, index search, run queues, check updates).</li>
+<li>Run manually: <code>ddev drush cron</code> or UI <code>/admin/config/system/cron</code>.</li>
+<li>Implement <code>hook_cron()</code> (or <code>#[Hook('cron')]</code>) or a queue worker with <code>cron:</code> time.</li>
+<li>Production: use system cron or a scheduler calling <code>drush cron</code> (Automated Cron runs on page requests, not ideal for production).</li>
+</ul>
+
+<h2>13.7 Mail</h2>
+<pre><code>$mailManager = \Drupal::service('plugin.manager.mail');
+$mailManager-&gt;mail('training', 'notify', $to, 'en', ['msg' =&gt; 'Hi'], NULL, TRUE);
+// hook_mail() builds subject/body
+function training_mail($key, &amp;$message, $params) {
+  if ($key == 'notify') { $message['subject'] = 'Hello'; $message['body'][] = $params['msg']; }
+}</code></pre>
+<p>Locally, view mail in <code>ddev mailpit</code>.</p>
+
+<h2>13.8 Logging and messages</h2>
+<pre><code>\Drupal::logger('training')-&gt;error('Failed: @e', ['@e' =&gt; $msg]);   // levels: debug info notice warning error critical alert emergency
+\Drupal::messenger()-&gt;addStatus('Saved');   // addWarning / addError</code></pre>
+
+<h2>Exercise 13.1</h2>
+<div class="box ex"><b>Task:</b> Using <code>drush php:eval</code> create an Event node, then query for featured events and print titles, then change one title.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush php:eval '
+$n = \Drupal\node\Entity\Node::create(["type"=&gt;"event","title"=&gt;"CLI Event","field_featured"=&gt;1,"status"=&gt;1]); $n-&gt;save();
+$ids = \Drupal::entityQuery("node")-&gt;accessCheck(FALSE)-&gt;condition("type","event")-&gt;condition("field_featured",1)-&gt;execute();
+foreach (\Drupal\node\Entity\Node::loadMultiple($ids) as $e) { echo $e-&gt;label().PHP_EOL; }
+$n-&gt;setTitle("CLI Event v2")-&gt;save();'</code></pre></div>
+
+<h1>14. Security</h1>
+<h2>14.1 Threats and Drupal's defences</h2>
+<table>
+<tr><th>Threat</th><th>Meaning</th><th>Prevention in Drupal</th></tr>
+<tr><td><b>XSS</b> (cross-site scripting)</td><td>Attacker injects JavaScript into pages</td><td>Twig auto-escapes; use <code>#markup</code> (filtered) or <code>#plain_text</code>; <code>Xss::filterAdmin()</code>, <code>Html::escape()</code>; never <code>|raw</code> on user input; restrict text formats.</td></tr>
+<tr><td><b>SQL injection</b></td><td>Attacker alters SQL</td><td>Use query builder / placeholders. No string concatenation.</td></tr>
+<tr><td><b>CSRF</b></td><td>Forged requests by a logged-in user</td><td>Form tokens automatic; routes with <code>_csrf_token: 'TRUE'</code> requirement for links that change data.</td></tr>
+<tr><td><b>Access bypass</b></td><td>Users reach what they should not</td><td>Always set route <code>requirements</code>, check entity access, use <code>accessCheck(TRUE)</code>.</td></tr>
+<tr><td><b>File upload attacks</b></td><td>Malicious files</td><td>Restrict extensions, use private files for sensitive data, never allow php/exe.</td></tr>
+<tr><td><b>Brute force</b></td><td>Password guessing</td><td>Flood control (core), Login Security, strong passwords, 2FA module.</td></tr>
+<tr><td><b>Session hijacking</b></td><td>Stolen session cookie</td><td>HTTPS everywhere, secure cookies, session regeneration (core does).</td></tr>
+<tr><td><b>Information disclosure</b></td><td>Errors leak details</td><td>Production: hide errors (<code>/admin/config/development/logging</code> &rarr; None), keep settings.php out of web writable.</td></tr>
+<tr><td><b>Outdated code</b></td><td>Known vulnerabilities</td><td>Apply security updates quickly (Drupal Security Team advisories SA-CORE / SA-CONTRIB).</td></tr>
+</table>
+
+<h2>14.2 Security checklist</h2>
+<ul>
+<li>Use HTTPS; set <code>$settings['trusted_host_patterns']</code> in settings.php.</li>
+<li>Keep core and contrib updated: <code>composer audit</code>, <b>Available updates</b> report.</li>
+<li>Least-privilege roles; do not hand out "administer ..." permissions.</li>
+<li>Use "Basic HTML" for authenticated users, "Restricted HTML" for anonymous; Full HTML for admins only.</li>
+<li>Protect <code>settings.php</code>: <code>chmod 444</code>; put <code>sites/default/files/private</code> outside the web root: <code>$settings['file_private_path'] = '../private';</code>.</li>
+<li>Disable dev modules (devel, webprofiler) in production.</li>
+<li>Change user 1's name from "admin"; use strong passwords; consider 2FA.</li>
+<li>Block users from PHP execution in files directories (Apache/Nginx rules; Drupal writes .htaccess).</li>
+<li>Check <code>/admin/reports/status</code> for warnings, and use the <b>Security Review</b> module.</li>
+<li>Do not run <code>update.php</code> access publicly (<code>$settings['update_free_access'] = FALSE;</code>).</li>
+</ul>
+
+<h2>14.3 Code-level security patterns</h2>
+<pre><code>use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
+$safe = Html::escape($user_input);
+$filtered = Xss::filter($user_input);                // allows safe tags
+$build = ['#markup' =&gt; $this-&gt;t('Hi @n', ['@n' =&gt; $name])];   // placeholder escapes
+// CSRF-protected link route
+# routing: requirements: _csrf_token: 'TRUE'
+// access result with caching
+return AccessResult::allowedIfHasPermission($account, 'administer training')-&gt;cachePerPermissions();</code></pre>
+
+<h2>Exercise 14.1</h2>
+<div class="box ex"><b>Task:</b> A teammate wrote <code>'#markup' =&gt; '&lt;p&gt;Hello ' . $_GET['name'] . '&lt;/p&gt;'</code>. Explain the vulnerability and fix it.</div>
+<div class="box ans"><b>Answer:</b> It is reflected XSS: <code>?name=&lt;script&gt;...&lt;/script&gt;</code> runs script in the visitor's browser. Fix: use the Request object, a placeholder and escaping:
+<pre><code>$name = \Drupal::request()-&gt;query-&gt;get('name', '');
+return ['#markup' =&gt; $this-&gt;t('Hello @name', ['@name' =&gt; $name])];
+// or '#plain_text' =&gt; $name, and add cache context 'url.query_args:name'</code></pre></div>
+
+<h1>15. Performance and caching</h1>
+<h2>15.1 Drupal cache layers</h2>
+<table>
+<tr><th>Layer</th><th>Meaning</th></tr>
+<tr><td><b>Internal Page Cache</b></td><td>Caches full pages for anonymous users (core module).</td></tr>
+<tr><td><b>Dynamic Page Cache</b></td><td>Caches pages for all users except the personalised parts (placeholders).</td></tr>
+<tr><td><b>BigPipe</b></td><td>Streams cacheable page parts first, then personalised parts.</td></tr>
+<tr><td><b>Render cache</b></td><td>Caches render array fragments.</td></tr>
+<tr><td><b>Twig cache</b></td><td>Compiled templates in PHP files.</td></tr>
+<tr><td><b>Views cache</b></td><td>Query results and rendered output (Tag based / Time based).</td></tr>
+<tr><td><b>Cache bins</b></td><td>Storage buckets: <code>default, render, data, discovery, bootstrap, config, entity, menu, page, dynamic_page_cache</code>.</td></tr>
+<tr><td><b>Backend</b></td><td>Database by default; Redis/Memcache for speed.</td></tr>
+<tr><td><b>Browser/CDN cache</b></td><td>Controlled by <code>Cache-Control</code> max-age (Performance page) and a CDN or Varnish.</td></tr>
+</table>
+
+<h2>15.2 Cache metadata (the 3 pieces) &mdash; very common question</h2>
+<table>
+<tr><th>Metadata</th><th>Meaning</th><th>Example</th></tr>
+<tr><td><b>Tags</b></td><td>"What data did this depend on?" When tagged data changes, the cache is invalidated.</td><td><code>node:5</code>, <code>node_list</code>, <code>config:system.site</code>, <code>user:3</code></td></tr>
+<tr><td><b>Contexts</b></td><td>"What request conditions cause variations?" One cached copy per context value.</td><td><code>user.roles</code>, <code>languages</code>, <code>url.path</code>, <code>url.query_args</code>, <code>route</code>, <code>theme</code>, <code>user.permissions</code></td></tr>
+<tr><td><b>Max-age</b></td><td>"How long can this be cached?" <code>0</code> = never cache (avoid; it disables page cache), <code>Cache::PERMANENT</code> = until tags invalidate.</td><td><code>3600</code></td></tr>
+</table>
+<pre><code>$build['#cache'] = [
+  'tags' =&gt; ['node_list:event', 'config:training.settings'],
+  'contexts' =&gt; ['user.roles', 'url.query_args:category'],
+  'max-age' =&gt; Cache::PERMANENT,
+];
+// a node: $node-&gt;getCacheTags() returns ['node:5']</code></pre>
+<div class="box"><b>Interview one-liner:</b> "Drupal's cache is correct by default: every render array carries tags, contexts and max-age. Cache invalidation is by tag, so editing a node automatically refreshes every page that displayed it."</div>
+<h3>Lazy builders / placeholders</h3>
+<p>For personalised or uncacheable parts (cart count, username) use <code>#lazy_builder</code> so the rest of the page stays cached and BigPipe/dynamic page cache fills in the placeholder.</p>
+
+<h2>15.3 Performance settings and tuning</h2>
+<ul>
+<li><b>Configuration &rarr; Development &rarr; Performance</b> (<code>/admin/config/development/performance</code>): browser and proxy cache max age, aggregate CSS/JS (on in production), clear all caches.</li>
+<li>Enable <b>Internal Page Cache</b>, <b>Dynamic Page Cache</b>, <b>BigPipe</b>.</li>
+<li>Use <b>Redis</b> for cache and locks; <b>Varnish</b> or a CDN (Cloudflare, Fastly) for full-page caching with tag-based purging.</li>
+<li>Optimise images: image styles, WebP, lazy loading, responsive images.</li>
+<li>Views: avoid loading all entities for huge lists; use fields instead of full entity rendering; add pagers; use caching; avoid heavy relationships.</li>
+<li>Database: indexes on custom tables, avoid N+1 queries (use <code>loadMultiple</code>), PHP OPcache enabled, current PHP version.</li>
+<li>Profiling tools: Devel/Webprofiler (dev), Blackfire, New Relic, Xdebug profiler, <code>ddev xdebug</code>.</li>
+</ul>
+<h3>drush cr vs ... when to clear cache</h3>
+<table>
+<tr><th>After you change</th><th>Do</th></tr>
+<tr><td>Twig template (new file), theme hook, library, info.yml, routing, services, hooks, plugin (new class)</td><td><code>drush cr</code></td></tr>
+<tr><td>Editing an existing Twig file with Twig cache on</td><td>Usually reloads automatically in dev (auto_reload), else <code>drush cr</code></td></tr>
+<tr><td>Content or config through the UI</td><td>Nothing; tags invalidate automatically</td></tr>
+<tr><td>CSS/JS aggregation issues</td><td><code>drush cr</code> then hard refresh the browser</td></tr>
+</table>
+
+<h2>Exercise 15.1</h2>
+<div class="box ex"><b>Task:</b> A block shows "Latest 3 events" but new events do not appear for an hour. Why, and what is the right fix? </div>
+<div class="box ans"><b>Answer:</b> The block uses <code>max-age 3600</code> without a tag for the list. Fix with the right cache tag so it invalidates when any Event changes: <code>'#cache' =&gt; ['tags' =&gt; ['node_list:event']]</code> (and keep <code>max-age</code> permanent). Do not set max-age to 0 or call <code>drush cr</code> as a workaround. If the content depends on the user's role, add the context <code>user.roles</code>.</div>
+
+<h1>16. Testing, coding standards, debugging</h1>
+<h2>16.1 Test types</h2>
+<table>
+<tr><th>Type</th><th>Base class</th><th>Meaning / speed</th></tr>
+<tr><td>Unit</td><td><code>UnitTestCase</code></td><td>One class, no Drupal bootstrap. Fastest.</td></tr>
+<tr><td>Kernel</td><td><code>KernelTestBase</code></td><td>Partial Drupal bootstrap with selected modules, real DB. Good for services, entities.</td></tr>
+<tr><td>Functional</td><td><code>BrowserTestBase</code></td><td>Full site, simulated browser (no JavaScript). Slower.</td></tr>
+<tr><td>FunctionalJavascript</td><td><code>WebDriverTestBase</code></td><td>Real browser with JS (needs Chrome/Selenium).</td></tr>
+<tr><td>Nightwatch / Playwright / Cypress</td><td>-</td><td>End-to-end (front end).</td></tr>
+</table>
+<pre><code>// web/modules/custom/training/tests/src/Unit/GreeterTest.php
+namespace Drupal\Tests\training\Unit;
+use Drupal\Tests\UnitTestCase;
+class GreeterTest extends UnitTestCase {
+  public function testGreeting(): void { $this-&gt;assertSame('Hello', 'Hello'); }
+}</code></pre>
+<pre><code>ddev exec "cd web &amp;&amp; ../vendor/bin/phpunit -c core modules/custom/training/tests"
+# needs phpunit config: copy web/core/phpunit.xml.dist to web/phpunit.xml, set SIMPLETEST_DB and SIMPLETEST_BASE_URL</code></pre>
+<p><b>Testing frameworks:</b> PHPUnit (core), Behat (behaviour), Playwright/Cypress (E2E). Require dev tools with <code>ddev composer require --dev drupal/core-dev</code>.</p>
+
+<h2>16.2 Coding standards and static analysis</h2>
+<pre><code>ddev composer require --dev drupal/coder phpstan/phpstan mglaman/phpstan-drupal
+ddev exec vendor/bin/phpcs --standard=Drupal,DrupalPractice web/modules/custom
+ddev exec vendor/bin/phpcbf --standard=Drupal web/modules/custom    # auto-fix
+ddev exec vendor/bin/phpstan analyse web/modules/custom --level=5</code></pre>
+<p>Drupal coding standard: 2-space indentation, <code>lowerCamelCase</code> methods/properties, <code>snake_case</code> for procedural functions and variables in procedural code (modern code uses camelCase), docblocks for classes and methods, <code>use</code> statements at top, files end with a newline.</p>
+
+<h2>16.3 Debugging toolbox</h2>
+<table>
+<tr><th>Tool</th><th>How / when</th></tr>
+<tr><td>Watchdog / dblog</td><td><code>/admin/reports/dblog</code> or <code>drush ws</code>; <code>drush ws --severity=error --count=20</code>; tail live: <code>drush ws --tail</code></td></tr>
+<tr><td>Error display</td><td><code>/admin/config/development/logging</code> &rarr; "All messages, with backtrace" (dev only). Or in settings.local.php: <code>$config['system.logging']['error_level'] = 'verbose';</code></td></tr>
+<tr><td>Devel</td><td><code>dpm($var)</code> / <code>dd($var)</code> / <code>kint($var)</code> (needs devel + kint). <code>ddev drush ev "dpm(1)"</code> alternatives: <code>\Drupal::logger()</code>.</td></tr>
+<tr><td>Xdebug</td><td><code>ddev xdebug on</code>, set breakpoints in VS Code (PHP Debug extension) and listen on port 9003; <code>ddev xdebug off</code> when done (it slows PHP).</td></tr>
+<tr><td>Twig debug</td><td>Section 10.5</td></tr>
+<tr><td>Views</td><td>Settings &rarr; show SQL query and timing; Preview section.</td></tr>
+<tr><td>Browser tools</td><td>Network, console; Drupal sends headers <code>X-Drupal-Cache</code>, <code>X-Drupal-Dynamic-Cache</code>, and with debug enabled <code>X-Drupal-Cache-Tags</code>.</td></tr>
+<tr><td>Status report</td><td><code>/admin/reports/status</code></td></tr>
+<tr><td>Local settings</td><td><code>settings.local.php</code> with dev overrides, loaded at the bottom of settings.php.</td></tr>
+</table>
+<h3>Common problems &rarr; fix</h3>
+<table>
+<tr><th>Symptom</th><th>Likely fix</th></tr>
+<tr><td>White screen (WSOD) / "The website encountered an unexpected error"</td><td>Check dblog or <code>ddev logs</code>; fix PHP error; <code>drush cr</code></td></tr>
+<tr><td>Changes to Twig/CSS not showing</td><td><code>drush cr</code>; disable CSS aggregation in dev; hard refresh</td></tr>
+<tr><td>"Page not found" for a new route</td><td><code>drush cr</code>; check indentation in routing.yml</td></tr>
+<tr><td>"Module not found" after composer</td><td>Check path <code>web/modules/contrib</code>; <code>ddev composer install</code>; <code>drush en</code></td></tr>
+<tr><td>Config import fails with UUID mismatch</td><td>Site UUID differs: set same UUID or reinstall from the exported config</td></tr>
+<tr><td>"Allowed memory size exhausted"</td><td>Increase PHP memory (<code>.ddev/php/*.ini</code>); investigate big loops, use batch/queues</td></tr>
+<tr><td>Permission denied on files</td><td>Fix ownership/chmod on <code>sites/default/files</code></td></tr>
+<tr><td>Locked out</td><td><code>ddev drush uli</code> or <code>drush upwd admin newpass</code></td></tr>
+<tr><td>Update hook pending</td><td><code>drush updb -y</code></td></tr>
+<tr><td>Composer conflict</td><td><code>composer why-not</code>, <code>composer prohibits</code>; update with <code>--with-all-dependencies</code></td></tr>
+</table>
+
+<h1>17. Migrate, JSON:API, headless, multilingual, deployment</h1>
+<h2>17.1 Migrate API</h2>
+<p><b>Meaning:</b> A framework to import data from other sources (CSV, JSON, SQL, another Drupal site) into Drupal. Pipeline: <b>source</b> &rarr; <b>process</b> (transform field by field) &rarr; <b>destination</b>. IDs are tracked in map tables to support rollback and updates.</p>
+<pre><code># migrations on a custom module: config/install/migrate_plus.migration.events_csv.yml
+# or core-only: migrations/events_csv.yml
+id: events_csv
+label: Events from CSV
+source:
+  plugin: csv           # from migrate_source_csv
+  path: modules/custom/training/data/events.csv
+  ids: [id]
+process:
+  title: name
+  field_location: place
+  type:
+    plugin: default_value
+    default_value: event
+destination:
+  plugin: entity:node</code></pre>
+<pre><code>ddev composer require drupal/migrate_plus drupal/migrate_tools drupal/migrate_source_csv
+ddev drush en migrate_plus migrate_tools migrate_source_csv -y
+ddev drush migrate:status
+ddev drush migrate:import events_csv
+ddev drush migrate:rollback events_csv
+ddev drush migrate:import events_csv --update</code></pre>
+<p>Core Drupal-to-Drupal upgrades (7 &rarr; 10/11) use the <code>migrate_drupal</code> and <code>migrate_drupal_ui</code> modules (<code>/upgrade</code>). Common process plugins: <code>get, default_value, static_map, migration_lookup, concat, explode, callback, format_date, skip_on_empty, sub_process, entity_generate</code>.</p>
+
+<h2>17.2 JSON:API and REST (headless Drupal)</h2>
+<ul>
+<li><b>JSON:API</b> (core) automatically exposes all entities: <code>/jsonapi/node/event</code>, <code>/jsonapi/node/event/{uuid}</code>. Supports <code>filter</code>, <code>sort</code>, <code>page[limit]</code>, <code>include</code>, <code>fields[node--event]=title,field_location</code>.</li>
+<li>Enable: <code>ddev drush en jsonapi -y</code>. Config: <code>/admin/config/services/jsonapi</code> (read-only mode recommended unless you need writes).</li>
+<li>Example: <code>/jsonapi/node/event?filter[field_featured]=1&amp;sort=-created&amp;page[limit]=5&amp;include=field_category</code></li>
+<li><b>RESTful Web Services</b> (core): custom resources and Views "REST export" display.</li>
+<li><b>GraphQL</b> (contrib) is an alternative.</li>
+<li><b>Authentication:</b> cookie (same domain), Basic Auth (core), OAuth2 / Simple OAuth (contrib), JWT (contrib). Always use HTTPS.</li>
+<li><b>CORS:</b> in <code>sites/default/services.yml</code>: <code>cors.config: enabled: true, allowedOrigins: ['https://app.example.com']</code>.</li>
+<li><b>Decoupled / headless:</b> Drupal as the back end, a JS front end (Next.js, Nuxt, React). <b>Progressively decoupled</b>: Drupal renders pages and parts use JS components.</li>
+</ul>
+
+<h2>17.3 Multilingual</h2>
+<ol>
+<li>Enable <code>language</code>, <code>content_translation</code>, <code>locale</code> (interface translation), <code>config_translation</code>.</li>
+<li><b>Add languages:</b> Configuration &rarr; Regional and language &rarr; Languages &rarr; Add language.</li>
+<li><b>Detection:</b> Languages &rarr; Detection and selection (URL prefix <code>/fr/...</code>, domain, session, browser, user).</li>
+<li><b>Enable translation for content type:</b> Configuration &rarr; Regional and language &rarr; Content language and translation (<code>/admin/config/regional/content-language</code>) &rarr; tick Content &rarr; Event &rarr; mark fields translatable.</li>
+<li><b>Translate:</b> Node &rarr; Translate tab &rarr; Add. <b>Interface strings:</b> Configuration &rarr; Regional and language &rarr; User interface translation. <b>Config:</b> Configuration &rarr; Regional and language &rarr; Configuration translation.</li>
+</ol>
+<p>Commands: <code>drush locale:check</code>, <code>drush locale:update</code>. Use <code>$this-&gt;t()</code> and <code>{{ 'text'|t }}</code> for all strings.</p>
+
+<h2>17.4 Deployment workflow</h2>
+<pre><code># local
+git pull
+ddev composer install
+ddev drush updb -y
+ddev drush cim -y
+ddev drush cr
+
+# production deploy script (typical)
+git pull origin main
+composer install --no-dev --optimize-autoloader
+drush maintenance:set 1   # optional (drush state:set system.maintenance_mode 1)
+drush updb -y
+drush cim -y
+drush cr
+drush maintenance:set 0</code></pre>
+<ul>
+<li><b>Order matters:</b> code &rarr; <code>composer install</code> &rarr; <code>updb</code> &rarr; <code>cim</code> &rarr; <code>cr</code>.</li>
+<li><b>Environments:</b> local (DDEV) &rarr; dev &rarr; staging &rarr; production. Content flows production &rarr; down (database copy); config flows up (via Git).</li>
+<li><b>Hosting:</b> Acquia, Pantheon, Platform.sh / Upsun, DDEV Pro, Amazon, plain VPS with Nginx + PHP-FPM + MariaDB.</li>
+<li><b>CI/CD:</b> GitHub Actions / GitLab CI / Jenkins: install, lint (phpcs), static analysis (phpstan), tests (phpunit), then deploy.</li>
+<li><b>Version control:</b> commit <code>composer.json</code>, <code>composer.lock</code>, <code>config/</code>, <code>web/modules/custom</code>, <code>web/themes/custom</code>. Do <b>not</b> commit <code>vendor/</code> (unless host requires), <code>web/core</code> and contrib (installed by composer), <code>web/sites/default/files</code>, <code>settings.local.php</code>.</li>
+<li><b>Backups:</b> <code>drush sql:dump --gzip --result-file=../backup.sql</code> and file backups.</li>
+<li><b>Maintenance mode:</b> <code>/admin/config/development/maintenance</code>.</li>
+</ul>
+
+<h2>17.5 Multisite, install profiles, distributions</h2>
+<ul>
+<li><b>Multisite:</b> one codebase, multiple sites in <code>web/sites/&lt;name&gt;/</code>, with <code>sites.php</code> mapping domains. Pros: shared code updates; cons: shared failure points.</li>
+<li><b>Install profile:</b> predefines modules/config at install (Standard, Minimal, Demo Umami).</li>
+<li><b>Distribution:</b> profile + code for a use case (Drupal CMS, OpenSocial).</li>
+</ul>
+
+<h2>Exercise 17.1</h2>
+<div class="box ex"><b>Task:</b> Enable JSON:API and fetch featured events with their category names and only title + location fields. </div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush en jsonapi -y
+curl "https://drupal112-training.ddev.site/jsonapi/node/event?filter[field_featured]=1&amp;include=field_category&amp;fields[node--event]=title,field_location,field_category&amp;fields[taxonomy_term--event_category]=name"</code></pre>
+Anonymous users need "Access content" permission. Terms are returned in the <code>included</code> array.</div>
+
+
+<h1>18. Drush and Composer cheat sheet</h1>
+<p>Prefix with <code>ddev</code> locally (<code>ddev drush cr</code>). Format: command &mdash; when to use.</p>
+<h2>18.1 Drush</h2>
+<table>
+<tr><th>Group</th><th>Command</th><th>When to use</th></tr>
+<tr><td rowspan="4">Basics</td><td><code>drush status</code></td><td>Check version, DB, paths</td></tr>
+<tr><td><code>drush cr</code></td><td>Any code/theme/routing/services change; "it doesn't work"</td></tr>
+<tr><td><code>drush uli [--uid=2]</code></td><td>Login link; forgot password</td></tr>
+<tr><td><code>drush upwd admin "NewPass1!"</code></td><td>Reset a password</td></tr>
+<tr><td rowspan="5">Modules/themes</td><td><code>drush en MODULE -y</code></td><td>Install module</td></tr>
+<tr><td><code>drush pmu MODULE -y</code></td><td>Uninstall module</td></tr>
+<tr><td><code>drush pm:list --status=enabled</code></td><td>See what is installed</td></tr>
+<tr><td><code>drush theme:install THEME</code></td><td>Install theme</td></tr>
+<tr><td><code>drush pm:security</code></td><td>Check Composer packages for security advisories</td></tr>
+<tr><td rowspan="6">Config</td><td><code>drush cex -y</code></td><td>Export config after building in UI</td></tr>
+<tr><td><code>drush cim -y</code></td><td>Import config after pulling code</td></tr>
+<tr><td><code>drush config:status</code></td><td>Show differences</td></tr>
+<tr><td><code>drush cget system.site</code></td><td>Read config</td></tr>
+<tr><td><code>drush cset system.site name "X" -y</code></td><td>Change config</td></tr>
+<tr><td><code>drush config:delete NAME</code></td><td>Delete a config item</td></tr>
+<tr><td rowspan="3">Database</td><td><code>drush updb -y</code></td><td>After code update / deploy</td></tr>
+<tr><td><code>drush sql:dump &gt; file.sql</code></td><td>Backup</td></tr>
+<tr><td><code>drush sql:cli</code> / <code>drush sql:query "SELECT ..."</code></td><td>Run SQL</td></tr>
+<tr><td rowspan="4">Users</td><td><code>drush user:create NAME --mail=... --password=...</code></td><td>Create user</td></tr>
+<tr><td><code>drush user:role:add ROLE NAME</code></td><td>Give role</td></tr>
+<tr><td><code>drush user:block NAME</code> / <code>user:unblock</code></td><td>Block/unblock</td></tr>
+<tr><td><code>drush role:perm:add ROLE "perm"</code></td><td>Grant permission</td></tr>
+<tr><td rowspan="5">Runtime</td><td><code>drush cron</code></td><td>Run cron</td></tr>
+<tr><td><code>drush ws --count=20</code> / <code>--severity=error</code> / <code>--tail</code></td><td>Read logs</td></tr>
+<tr><td><code>drush php:eval 'code'</code> (ev)</td><td>Quick PHP</td></tr>
+<tr><td><code>drush php:cli</code> (php)</td><td>Interactive shell</td></tr>
+<tr><td><code>drush state:set system.maintenance_mode 1</code></td><td>Maintenance mode</td></tr>
+<tr><td rowspan="5">Dev helpers</td><td><code>drush generate module / controller / form:simple / plugin:block / entity:content / theme / hook</code></td><td>Scaffold code</td></tr>
+<tr><td><code>drush devel-generate:content 20 --bundles=event</code></td><td>Dummy content</td></tr>
+<tr><td><code>drush views:dev</code> / <code>views:list</code></td><td>Views dev mode (disable caches)</td></tr>
+<tr><td><code>drush queue:list</code> / <code>queue:run NAME</code></td><td>Queues</td></tr>
+<tr><td><code>drush sa @alias</code>, <code>drush @prod status</code>, <code>drush rsync</code>, <code>drush sql:sync @prod @self</code></td><td>Remote operations via aliases (<code>drush/sites/*.site.yml</code>)</td></tr>
+<tr><td rowspan="3">Other</td><td><code>drush deploy</code></td><td>Runs <code>updb</code>, <code>cr</code>, <code>cim</code>, <code>cr</code>, deploy hooks in the right order. Great for pipelines.</td></tr>
+<tr><td><code>drush deploy:hook</code></td><td>Run <code>hook_deploy_NAME</code> one-time deploy code</td></tr>
+<tr><td><code>drush list</code> / <code>drush help CMD</code></td><td>Discover commands</td></tr>
+</table>
+
+<h2>18.2 Composer</h2>
+<table>
+<tr><th>Command</th><th>When to use</th></tr>
+<tr><td><code>composer require drupal/NAME</code></td><td>Add module/theme</td></tr>
+<tr><td><code>composer require --dev drupal/devel</code></td><td>Dev-only package</td></tr>
+<tr><td><code>composer remove drupal/NAME</code></td><td>Remove (after uninstalling in Drupal)</td></tr>
+<tr><td><code>composer update drupal/NAME --with-dependencies</code></td><td>Update one project</td></tr>
+<tr><td><code>composer update "drupal/core-*" --with-all-dependencies</code></td><td>Core update</td></tr>
+<tr><td><code>composer install --no-dev --optimize-autoloader</code></td><td>Production deploy</td></tr>
+<tr><td><code>composer outdated "drupal/*"</code></td><td>What can be updated</td></tr>
+<tr><td><code>composer audit</code></td><td>Security advisories</td></tr>
+<tr><td><code>composer show drupal/core</code></td><td>Installed version</td></tr>
+<tr><td><code>composer why drupal/token</code> / <code>why-not</code></td><td>Dependency reasons/blockers</td></tr>
+<tr><td><code>composer validate</code></td><td>Check composer.json</td></tr>
+<tr><td><code>composer require cweagans/composer-patches</code></td><td>Apply patches from drupal.org issues (<code>extra.patches</code> in composer.json)</td></tr>
+</table>
+
+<h2>18.3 Git (basics for projects)</h2>
+<pre><code>git status
+git add -A &amp;&amp; git commit -m "Add event type and config"
+git checkout -b feature/events
+git push -u origin feature/events
+git pull --rebase origin main
+git log --oneline -10</code></pre>
+
+<h2>18.4 Quick "when to use what" table</h2>
+<table>
+<tr><th>I need to...</th><th>Use</th></tr>
+<tr><td>list content with filters</td><td>Views</td></tr>
+<tr><td>structure data</td><td>Content type + fields</td></tr>
+<tr><td>categorise content</td><td>Taxonomy</td></tr>
+<tr><td>reusable media</td><td>Media + Media Library</td></tr>
+<tr><td>flexible landing pages</td><td>Layout Builder or Paragraphs</td></tr>
+<tr><td>forms with emails</td><td>Webform</td></tr>
+<tr><td>custom logic on content save</td><td>Hook or event subscriber</td></tr>
+<tr><td>a new page</td><td>Route + controller</td></tr>
+<tr><td>a reusable output piece</td><td>Block plugin</td></tr>
+<tr><td>a reusable function</td><td>Service</td></tr>
+<tr><td>settings page</td><td>ConfigFormBase</td></tr>
+<tr><td>change markup</td><td>Twig override + preprocess</td></tr>
+<tr><td>move site settings between environments</td><td>Config export/import</td></tr>
+<tr><td>move content</td><td>Migrate / default content / DB copy</td></tr>
+<tr><td>heavy work</td><td>Queue + cron</td></tr>
+<tr><td>expose data to an app</td><td>JSON:API / REST</td></tr>
+</table>
+
+<h1>19. Interview Q&amp;A</h1>
+<p>Answer in your own words. The short answers below are interview-length.</p>
+
+<h2>A. Basics</h2>
+<p class="q">1. What is Drupal?</p><p>An open-source PHP content management framework on Symfony, used for complex, scalable, secure sites with granular permissions and multilingual support.</p>
+<p class="q">2. What is the difference between a node, a content type and a field?</p><p>A node is one piece of content. A content type is the template/bundle defining its fields. A field is a data slot.</p>
+<p class="q">3. What is an entity? A bundle?</p><p>An entity is a data object managed by the Entity API (node, user, term, media...). A bundle is a subtype of an entity type (Article is a bundle of node).</p>
+<p class="q">4. What is the difference between content and configuration?</p><p>Configuration is site structure/settings exportable as YAML (content types, views, roles). Content is user data (nodes, users, terms) kept in the database, moved by migrations or DB copy.</p>
+<p class="q">5. What is the difference between core, contrib and custom?</p><p>Core ships with Drupal; contrib is community code on drupal.org; custom is code written for your project.</p>
+<p class="q">6. What is a block? A region?</p><p>A block is a placeable chunk of output. A region is a theme area where blocks go.</p>
+<p class="q">7. What is a view mode?</p><p>A named display configuration of an entity (Full, Teaser, Card) so the same content renders differently.</p>
+<p class="q">8. What is the difference between a widget and a formatter?</p><p>Widget = input on the edit form. Formatter = output on display.</p>
+<p class="q">9. What is a taxonomy?</p><p>A system of vocabularies containing terms used to categorise content.</p>
+<p class="q">10. What is Drupal CMS?</p><p>A pre-configured product built on Drupal core using recipes, aimed at easy site building; underneath it is the same Drupal.</p>
+<p class="q">11. What is Drupal Core's scaffold and recommended-project?</p><p><code>drupal/recommended-project</code> is the Composer template for new sites; <code>drupal/core-composer-scaffold</code> copies files like index.php into the docroot; <code>drupal/core-recommended</code> locks dependency versions.</p>
+<p class="q">12. What is the difference between Drupal 10 and 11?</p><p>Drupal 11 requires newer PHP (8.3+), updated Symfony 7, removes deprecated APIs, adds OOP hooks, attributes for plugins, Navigation, recipes and SDC maturing, and Single Directory Components.</p>
+<p class="q">13. What is a distribution, install profile, recipe?</p><p>Profile: initial setup at install. Distribution: profile plus code for a use case. Recipe: a one-time applicable package of config/modules/content.</p>
+<p class="q">14. What does <code>settings.php</code> contain?</p><p>Database credentials, hash salt, config sync directory, trusted hosts, file paths, overrides. Environment-specific; not committed with secrets.</p>
+<p class="q">15. What is the front controller?</p><p><code>web/index.php</code>, the single entry point that boots Drupal.</p>
+
+<h2>B. Site building</h2>
+<p class="q">16. How do you create a content type and add a field?</p><p>Structure &rarr; Content types &rarr; Add; Manage fields &rarr; Add field; configure widget (form display) and formatter (display).</p>
+<p class="q">17. How do you show the same content differently in two places?</p><p>Create/enable view modes and configure Manage display for each; select the mode in the view or template.</p>
+<p class="q">18. What is Views?</p><p>A UI query builder for lists, built on displays, fields, filters, sorts, relationships and contextual filters.</p>
+<p class="q">19. Contextual filter vs exposed filter?</p><p>Contextual filter takes its value from the URL/context. Exposed filter is a form control shown to the visitor.</p>
+<p class="q">20. What is a relationship in Views?</p><p>A join to a related entity so you can show its fields or filter by them.</p>
+<p class="q">21. How do you avoid duplicate rows in a View?</p><p>Enable Distinct, use aggregation, or adjust the multi-value field's "Display all values in the same row".</p>
+<p class="q">22. How do you add a view to a menu?</p><p>Page display &rarr; Page settings &rarr; Menu &rarr; Normal menu entry.</p>
+<p class="q">23. How do you display a View in a block?</p><p>Add a Block display, then place it in Structure &rarr; Block layout.</p>
+<p class="q">24. What is the difference between Layout Builder and Paragraphs?</p><p>Layout Builder arranges fields/blocks in layouts visually (per content type or per node). Paragraphs lets editors compose content from reusable component types inside a field.</p>
+<p class="q">25. Why use Media instead of an Image field?</p><p>Media entities are reusable, have metadata (alt, caption), a library UI, and support many sources (video, remote video, documents).</p>
+<p class="q">26. How do text formats protect a site?</p><p>They run filters (HTML restriction) on user input; weak formats allow XSS, so only trusted roles get Full HTML.</p>
+<p class="q">27. How do you create and use roles?</p><p>People &rarr; Roles; assign permissions on the Permissions page; assign roles to users.</p>
+<p class="q">28. What can user 1 do?</p><p>Bypasses all permission checks. Use sparingly; use an administrator role for daily work.</p>
+<p class="q">29. How do you set up URL aliases?</p><p>Manually per node or automatically with Pathauto patterns.</p>
+<p class="q">30. How do you enable moderation workflows?</p><p>Enable Workflows and Content Moderation; create/edit the Editorial workflow; attach content types; give roles transition permissions.</p>
+<p class="q">31. How do you build a contact form?</p><p>Core Contact module (<code>/contact</code>) for simple needs or Webform for advanced forms.</p>
+<p class="q">32. What are image styles?</p><p>Reusable image transformations (scale, crop, convert) that create derivative images on demand.</p>
+<p class="q">33. How does Drupal handle multilingual?</p><p>Language, Content Translation, Interface Translation and Configuration Translation modules provide languages, translatable fields, translated UI strings and translated config.</p>
+<p class="q">34. How do you make a field translatable?</p><p>Configuration &rarr; Content language and translation &rarr; enable for the entity bundle and tick the field.</p>
+<p class="q">35. What is a revision?</p><p>A stored historical version of an entity; you can compare and revert.</p>
+
+<h2>C. Config, deployment, tooling</h2>
+<p class="q">36. How does configuration management work?</p><p>Active config lives in the database; <code>drush cex</code> writes YAML to the sync directory under Git, and <code>drush cim</code> imports it on other environments.</p>
+<p class="q">37. What is the deployment order?</p><p><code>composer install</code> &rarr; <code>drush updb</code> &rarr; <code>drush cim</code> &rarr; <code>drush cr</code> (or <code>drush deploy</code>).</p>
+<p class="q">38. What is Config Split?</p><p>Contrib module that creates environment-specific config sets (dev modules, debug settings).</p>
+<p class="q">39. Why does config import complain about UUID?</p><p>The site UUID differs; sites must share one UUID to import each other's config.</p>
+<p class="q">40. composer.json vs composer.lock?</p><p>json = requirements; lock = exact installed versions. Servers use <code>composer install</code> to reproduce.</p>
+<p class="q">41. How do you update Drupal core?</p><p>Backup; <code>composer update "drupal/core-*" --with-all-dependencies</code>; <code>drush updb</code>; <code>drush cr</code>; test; commit.</p>
+<p class="q">42. How do you apply a patch to a contrib module?</p><p>Use <code>cweagans/composer-patches</code>, add the patch URL in <code>extra.patches</code> of composer.json, run <code>composer update drupal/module</code>.</p>
+<p class="q">43. What is Drush? What is Composer? Difference?</p><p>Composer manages PHP packages (installs code). Drush operates on a Drupal site (cache, config, updates).</p>
+<p class="q">44. What is DDEV?</p><p>A Docker-based local development environment with web server, PHP, database, and tools.</p>
+<p class="q">45. How do you migrate a database between environments?</p><p><code>drush sql:dump</code> and <code>drush sql:cli &lt; file</code>, or <code>ddev export-db/import-db</code>, or <code>drush sql:sync @source @self</code> with aliases.</p>
+<p class="q">46. What is a Drush alias?</p><p>A named remote site definition (<code>@prod</code>) in <code>drush/sites/*.site.yml</code> for running commands remotely.</p>
+<p class="q">47. What is the difference between <code>drush cr</code> and <code>drush cc all</code>?</p><p><code>cr</code> rebuilds the registry/container and clears all caches (the right one in modern Drupal); <code>cc all</code> is legacy.</p>
+<p class="q">48. How do you do a major upgrade 10 &rarr; 11?</p><p>Update to the latest 10.x, enable Upgrade Status, fix deprecated code and incompatible modules, update PHP, then require core 11 with Composer, run <code>updb</code>, test.</p>
+<p class="q">49. Which files should and should not be in Git?</p><p>In: custom code, config, composer files. Out: vendor/, core/contrib (usually), files directory, local settings, secrets.</p>
+<p class="q">50. How do you manage secrets?</p><p>Environment variables, <code>settings.local.php</code> not in Git, Key module, hosting secret managers.</p>
+
+<h2>D. Theming</h2>
+<p class="q">51. What template engine does Drupal use?</p><p>Twig (Symfony); auto-escapes output.</p>
+<p class="q">52. How do you override a template?</p><p>Enable Twig debug, find the file name suggestion, copy the core template into the theme's <code>templates/</code>, rename for specificity, clear cache.</p>
+<p class="q">53. What is a preprocess function?</p><p><code>THEME_preprocess_HOOK(&amp;$variables)</code> that prepares variables for a template.</p>
+<p class="q">54. How do you add CSS/JS?</p><p>Define a library in <code>THEME.libraries.yml</code>, attach it via info.yml, Twig <code>attach_library()</code>, or <code>#attached</code>.</p>
+<p class="q">55. Base theme vs sub-theme vs Starterkit?</p><p>Sub-theme inherits from a base theme; Starterkit generates an independent copy.</p>
+<p class="q">56. What is SDC?</p><p>Single Directory Components: Twig + CSS + JS + metadata schema in one folder, reusable and documented.</p>
+<p class="q">57. What are template suggestions?</p><p>Alternative file names Drupal tries, from most specific to least, for a render element.</p>
+<p class="q">58. What does <code>{{ content|without('field_x') }}</code> do?</p><p>Renders remaining content without that field.</p>
+<p class="q">59. Why is <code>|raw</code> dangerous?</p><p>It disables escaping and enables XSS if the value contains user input.</p>
+<p class="q">60. How do you debug Twig?</p><p>Set <code>twig.config.debug: true</code> in services.yml, use <code>{{ dump(var) }}</code> or kint, inspect HTML comments.</p>
+<p class="q">61. What is the Olivero theme? Claro? Stable9? Starterkit?</p><p>Olivero = default front end; Claro = admin; Stable9 = stable markup base; Starterkit = theme generator.</p>
+<p class="q">62. What is a render array?</p><p>A nested PHP array describing output with <code>#</code> properties (<code>#theme</code>, <code>#type</code>, <code>#markup</code>, <code>#cache</code>, <code>#attached</code>), rendered by the render system.</p>
+<p class="q">63. How do you make a theme responsive?</p><p>Mobile-first CSS, breakpoints file, responsive image styles, viewport meta (in base templates).</p>
+
+<h2>E. Module development</h2>
+<p class="q">64. What files make a minimum module?</p><p>Only <code>MODULE.info.yml</code>, in <code>web/modules/custom/MODULE/</code>.</p>
+<p class="q">65. How do you create a custom page?</p><p>Routing YAML entry + controller returning a render array.</p>
+<p class="q">66. How do you restrict access to a route?</p><p>Requirements: <code>_permission</code>, <code>_role</code>, <code>_entity_access</code>, <code>_custom_access</code>.</p>
+<p class="q">67. What is a service?</p><p>A reusable object defined in services.yml and created by the container.</p>
+<p class="q">68. What is dependency injection and why use it?</p><p>Passing dependencies via the constructor for testability and loose coupling; avoid <code>\Drupal::service()</code> inside classes.</p>
+<p class="q">69. Hooks vs events?</p><p>Hooks are named Drupal extension points (OOP attribute <code>#[Hook]</code> in D11); events use Symfony's dispatcher with subscriber classes and priorities.</p>
+<p class="q">70. What is a plugin?</p><p>A discoverable class implementing one variant of a feature, e.g. blocks, field formatters, queue workers.</p>
+<p class="q">71. Annotation vs attribute plugin discovery?</p><p>Both identify plugins; attributes (<code>#[Block]</code>) are native PHP 8 and preferred in Drupal 11; annotations still work.</p>
+<p class="q">72. How do you create a block programmatically?</p><p>A class in <code>src/Plugin/Block</code> extending <code>BlockBase</code> with <code>#[Block]</code> and <code>build()</code>.</p>
+<p class="q">73. How do you create a form?</p><p>Class extending <code>FormBase</code>/<code>ConfigFormBase</code> implementing <code>getFormId, buildForm, validateForm, submitForm</code>, with a route using <code>_form</code>.</p>
+<p class="q">74. How do you alter a form?</p><p><code>hook_form_alter</code> or <code>hook_form_FORM_ID_alter</code>.</p>
+<p class="q">75. How do you load/save an entity?</p><p><code>Node::load()</code>, <code>Node::create()</code>, <code>$node-&gt;save()</code> or the entity type manager storage.</p>
+<p class="q">76. Why does entityQuery need <code>accessCheck()</code>?</p><p>It must be explicit whether to enforce entity access; omitted causes an exception since Drupal 10.</p>
+<p class="q">77. How do you write a database query safely?</p><p>Database API with placeholders/conditions, never string concatenation.</p>
+<p class="q">78. How do you store module settings?</p><p>Config API with defaults in <code>config/install</code> and a schema, edited with a ConfigFormBase form.</p>
+<p class="q">79. State vs config vs settings?</p><p>Config = exportable site config; state = environment-specific runtime values; settings = server config in settings.php.</p>
+<p class="q">80. What is <code>hook_update_N</code>?</p><p>One-time database/config update run by <code>drush updb</code> when deploying new code.</p>
+<p class="q">81. How do you create a custom entity?</p><p>Define the entity class with <code>#[ContentEntityType]</code>, interface, base fields, handlers and routes (use <code>drush generate entity:content</code>), then install it via update hook or module install.</p>
+<p class="q">82. What is a queue worker used for?</p><p>Deferring heavy or slow tasks (emails, API calls) processed by cron or <code>drush queue:run</code>.</p>
+<p class="q">83. How do you add a custom field widget or formatter?</p><p>Plugin classes in <code>src/Plugin/Field/FieldWidget</code> and <code>FieldFormatter</code>.</p>
+<p class="q">84. How do you create a custom Views field/filter?</p><p>Plugin classes under <code>src/Plugin/views/field</code> etc. plus <code>hook_views_data</code> for custom tables.</p>
+<p class="q">85. How do you log errors?</p><p><code>\Drupal::logger('mod')->error(...)</code> or an injected logger factory.</p>
+<p class="q">86. What is a route parameter converter / upcasting?</p><p>Converting <code>{node}</code> in a path into a loaded Node object automatically.</p>
+<p class="q">87. How do you handle AJAX in forms?</p><p>Add <code>#ajax</code> with a callback and wrapper to an element; Drupal replaces the wrapper with the callback's render array.</p>
+<p class="q">88. How do you send an email?</p><p>Mail manager service + <code>hook_mail()</code>.</p>
+<p class="q">89. How do you run code on cron?</p><p><code>hook_cron()</code> or a QueueWorker with a cron time.</p>
+<p class="q">90. How do you redirect a user after login?</p><p>Use the <code>user_login_form</code> alter with a submit handler (<code>$form_state-&gt;setRedirect</code>), an event subscriber, or the Login Destination module.</p>
+
+<h2>F. Caching, performance, security</h2>
+<p class="q">91. Explain cache tags, contexts and max-age.</p><p>Tags invalidate caches when data changes; contexts create variations by request conditions; max-age limits lifetime.</p>
+<p class="q">92. What is BigPipe? Dynamic page cache?</p><p>BigPipe streams personalised pieces after cached content; dynamic page cache caches pages for authenticated users with placeholders for dynamic parts.</p>
+<p class="q">93. What does max-age 0 do?</p><p>Makes the response uncacheable; it bubbles up and can disable page caching, so avoid it.</p>
+<p class="q">94. How do you speed up a slow Drupal site?</p><p>Enable caches and aggregation, Redis, CDN/Varnish, optimise Views and images, use proper cache metadata, profile with Blackfire/Xdebug, upgrade PHP, add DB indexes, reduce modules.</p>
+<p class="q">95. How do you prevent XSS?</p><p>Rely on Twig auto-escape, placeholders in <code>t()</code>, restricted text formats, <code>Xss::filter</code>, avoid <code>|raw</code>.</p>
+<p class="q">96. How do you prevent SQL injection?</p><p>Query builder and placeholders.</p>
+<p class="q">97. How do you protect against CSRF?</p><p>Form tokens; <code>_csrf_token</code> route requirement for state-changing links.</p>
+<p class="q">98. How do you keep a Drupal site secure?</p><p>Update promptly, least privilege, HTTPS, trusted hosts, restricted formats, no debug in prod, private files, backups, monitor advisories.</p>
+<p class="q">99. What are Drupal security advisories?</p><p>SA-CORE-YYYY-NNN and SA-CONTRIB-YYYY-NNN published by the Drupal Security Team with severity and fix versions.</p>
+<p class="q">100. What is the flood control?</p><p>Core limits repeated login attempts per user/IP and exposes a Flood API for custom features.</p>
+
+<h2>G. Scenario questions</h2>
+<p class="q">101. "A page shows stale content after an edit." What do you check?</p><p>Cache tags on the render array, view cache settings, CDN/Varnish purge, custom code with max-age; not just <code>drush cr</code>.</p>
+<p class="q">102. "After deployment the site shows config errors."</p><p>Check order (updb before cim), UUID mismatch, missing modules in code, <code>drush config:status</code>, logs.</p>
+<p class="q">103. "Editors need to approve content before publishing."</p><p>Content Moderation + Workflows with an Editorial workflow and role-based transitions.</p>
+<p class="q">104. "Show related articles by shared tags."</p><p>View with contextual filter "Has taxonomy term ID" using the current node's terms (default value: PHP-free option via Views "Taxonomy terms on node" with "Allow multiple values") and exclude the current node via another contextual filter "Content ID" with "Exclude".</p>
+<p class="q">105. "Build a content listing with search, filters and pagination."</p><p>Views with exposed filters + pager, or Search API with Facets for large datasets.</p>
+<p class="q">106. "Import 10,000 rows from CSV."</p><p>Migrate API with migrate_plus, migrate_source_csv, run with <code>drush migrate:import</code>, rollback to retry.</p>
+<p class="q">107. "Expose content to a React app."</p><p>JSON:API with filters/includes, CORS, Simple OAuth for authentication, caching with tags.</p>
+<p class="q">108. "A module update breaks the site."</p><p>Restore the backup/snapshot, check release notes and change records, update in a branch, run tests, fix deprecations, or apply a patch.</p>
+<p class="q">109. "Restrict a page to premium members."</p><p>Add a role and route/permission, or use Group/Content Access; for node-level, node grants.</p>
+<p class="q">110. "Different layout for one landing page."</p><p>Layout Builder per-node override, or a template suggestion by node ID/alias.</p>
+
+<h2>H. Behavioural answers (prepare 3 stories)</h2>
+<ul>
+<li>A bug you fixed (cause &rarr; how you found it with logs/Xdebug &rarr; the fix &rarr; what you learned).</li>
+<li>A feature you built (requirement &rarr; Drupal tools chosen &rarr; result).</li>
+<li>A mistake or disagreement (what happened &rarr; how you handled it).</li>
+</ul>
+<div class="box warn"><b>Be honest.</b> If you built the Event site and the module from this guide, say exactly that. Interviewers value accurate answers with specific details (what you did, which command, what went wrong) more than invented experience.</div>
+
+<h1>20. Final revision checklist and mini-project</h1>
+<h2>20.1 The 2-day schedule</h2>
+<table>
+<tr><th>Block</th><th>Do</th></tr>
+<tr><td>Day 1 AM</td><td>Chapters 1-4. Start site. Build Event content type. Exercises 1.1, 2.1, 4.1.</td></tr>
+<tr><td>Day 1 PM</td><td>Chapters 5-7. Build the Views (5.1), taxonomy/menu/block/media (6.1), roles (7.1).</td></tr>
+<tr><td>Day 1 night</td><td>Chapter 8-9. Config export/import (8.1), install modules (9.1). Read Q&amp;A A-C aloud.</td></tr>
+<tr><td>Day 2 AM</td><td>Chapter 10-11. Theme + template override (10.1), module with route/block/form (11.1).</td></tr>
+<tr><td>Day 2 PM</td><td>Chapters 12-15. Service + hook (12.1), entity/DB code (13.1), XSS fix (14.1), cache tags (15.1).</td></tr>
+<tr><td>Day 2 night</td><td>Chapters 16-18, Q&amp;A D-H. Practise explaining the request lifecycle (1.5) and cache metadata (15.2) without notes.</td></tr>
+</table>
+
+<h2>20.2 Mini-project (portfolio proof)</h2>
+<p>Build the "Events site" end-to-end and put it on GitHub with a README:</p>
+<ol>
+<li>Content type Event + vocabulary + media + image style.</li>
+<li>View <code>/events</code> with exposed filter, block with next 3 events, term pages.</li>
+<li>Roles: Editor, with workflow Draft &rarr; Published.</li>
+<li>Custom theme with Event teaser template and one SDC card component.</li>
+<li>Custom module <code>training</code>: hello page, feedback form, Latest events block, service, <code>#[Hook]</code> logging.</li>
+<li>Config exported to <code>config/sync</code> and committed.</li>
+<li>JSON:API enabled; show a sample request in the README.</li>
+<li>phpcs passes on the custom module.</li>
+</ol>
+
+<h2>20.3 Interview day checklist</h2>
+<ul>
+<li>Can I explain: entity/bundle/field, config vs content, request lifecycle, cache tags/contexts/max-age, DI, hooks vs events vs plugins?</li>
+<li>Can I do from memory: create a content type, a View, a role, export config, write a route + controller, write a block, override a template?</li>
+<li>Do I know the update/deploy order and common Drush/Composer commands?</li>
+<li>Do I have 3 real stories from the projects I built?</li>
+<li>Can I say "I don't know that yet, here is how I would find out" (drupal.org docs, api.drupal.org, change records, issue queue)?</li>
+</ul>
+
+<h2>20.4 Resources</h2>
+<ul>
+<li>api.drupal.org (API reference), drupal.org/docs (official documentation), drupal.org/project/&lt;name&gt; (modules, issue queues), drupal.org/list-changes (change records).</li>
+<li>Drupalize.Me (paid tutorials), Drupal Slack, Stack Exchange (drupal.stackexchange.com), Drupal Easy podcast.</li>
+<li>Certification: Acquia Certified Drupal Site Builder / Developer.</li>
+</ul>
+<p class="small">Verify version-specific details (for example attribute names, Starterkit commands, SDC schema URL) against the official documentation for your exact Drupal 11 minor version before the interview; APIs evolve between minor releases.</p>
+
+
+</body></html>

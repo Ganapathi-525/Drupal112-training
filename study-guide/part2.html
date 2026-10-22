@@ -1,0 +1,341 @@
+<h1>4. Content types, fields, view modes</h1>
+<h2>4.1 Meaning</h2>
+<p><b>Content type</b> = a bundle of the node entity type with its own fields and settings. <b>Field</b> = typed data attached to an entity bundle. A field has a <b>storage</b> (type, cardinality: shared across bundles) and an <b>instance/config</b> (label, required, per bundle).</p>
+<div class="box"><b>Interview one-liner:</b> "A content type defines the structure of a kind of content. Fields hold the data, widgets control the edit form, formatters control the output, and view modes let the same content render differently in teasers, cards or full pages."</div>
+
+<h2>4.2 Core field types</h2>
+<table>
+<tr><th>Field type</th><th>Use for</th></tr>
+<tr><td>Text (plain / formatted / long / with summary)</td><td>Titles, descriptions, body</td></tr>
+<tr><td>Number (integer, decimal, float)</td><td>Price, quantity</td></tr>
+<tr><td>Boolean</td><td>Yes/no flags (Featured)</td></tr>
+<tr><td>Date / Date range / Timestamp</td><td>Event dates</td></tr>
+<tr><td>List (text, integer, float)</td><td>Fixed options (select, radios, checkboxes)</td></tr>
+<tr><td>Link</td><td>URL with title</td></tr>
+<tr><td>Email, Telephone</td><td>Contact info</td></tr>
+<tr><td>Entity reference (Content, Taxonomy term, User, Media, File, Custom block)</td><td>Relationships between items</td></tr>
+<tr><td>Image / File</td><td>Direct uploads (media is preferred for reuse)</td></tr>
+<tr><td>Entity reference revisions</td><td>Used by Paragraphs (contrib)</td></tr>
+</table>
+
+<h2>4.3 How to create a content type (navigation)</h2>
+<ol>
+<li><b>Structure &rarr; Content types &rarr; Add content type</b> (<code>/admin/structure/types/add</code>).</li>
+<li>Name: Event. Description. In <b>Publishing options</b>: default published, create new revision. In <b>Display settings</b>: toggle "Display author and date information". In <b>Menu settings</b>: allowed menus. Save.</li>
+<li>Click <b>Manage fields</b> &rarr; <b>Create a new field</b> &rarr; choose type &rarr; set label &amp; machine name (<code>field_event_date</code>) &rarr; set storage settings (cannot change type later) &rarr; field settings (required, help text, default) &rarr; Save.</li>
+<li><b>Manage form display</b>: drag fields to reorder; choose widget (Date picker, Autocomplete, Select list, Check boxes/radios, Media library).</li>
+<li><b>Manage display</b>: choose formatter, label position (above, inline, hidden), and which fields appear in <b>Default</b>, <b>Teaser</b>, other view modes. Use "Custom display settings" at the bottom to enable more view modes for that bundle.</li>
+</ol>
+<div class="box warn"><b>Gotcha:</b> The field machine name and type are permanent. Plan names before saving. Deleting a field deletes its data.</div>
+
+<h2>4.4 Entity reference settings</h2>
+<ul>
+<li><b>Reference type</b>: what is referenced (Content, Taxonomy term, User, Media).</li>
+<li><b>Reference method</b>: Default (choose bundles, sort) or View (use a Views display to filter choices).</li>
+<li><b>Create referenced entities if they don't already exist</b>: lets editors add new terms on the fly with autocomplete (tags).</li>
+<li><b>Allowed number of values</b>: Limited (1, 2...), or Unlimited.</li>
+</ul>
+
+<h2>4.5 View modes and form modes</h2>
+<ul>
+<li><b>View mode</b>: output variant (full, teaser, search result, card). Create new ones at <b>Structure &rarr; Display modes &rarr; View modes</b> (<code>/admin/structure/display-modes/view</code>).</li>
+<li><b>Form mode</b>: edit form variant. <b>Structure &rarr; Display modes &rarr; Form modes</b>.</li>
+</ul>
+<p>Use a view mode when you need the same content shown differently in different places (a list card vs a full page). In a View, choose "Show: Content" with a view mode, or "Fields".</p>
+
+<h2>4.6 Revisions, moderation, status</h2>
+<ul>
+<li><b>Revisions</b>: every save can create a new version (the "Revisions" tab on a node). You can revert.</li>
+<li><b>Content Moderation</b> (core module) and <b>Workflows</b> (core): draft &rarr; review &rarr; published states. Enable both modules, then go to <b>Configuration &rarr; Workflow &rarr; Workflows</b> (<code>/admin/config/workflow/workflows</code>), edit "Editorial", and attach it to the Event content type.</li>
+<li><b>Published</b> flag: unpublished nodes are visible only to users with the right permission.</li>
+</ul>
+
+<h2>4.7 URL aliases</h2>
+<ul>
+<li>Every node has a system path <code>/node/5</code>. An <b>alias</b> like <code>/events/my-concert</code> is nicer.</li>
+<li>Manual: node edit form &rarr; <b>URL alias</b> panel. Automatic: <b>Pathauto</b> module, pattern <code>/events/[node:title]</code> at <code>/admin/config/search/path/patterns</code>.</li>
+</ul>
+
+<h2>Exercise 4.1 &mdash; Event content type</h2>
+<div class="box ex"><b>Task:</b> Create content type <b>Event</b> with: Date range (<code>field_event_date</code>), Location (plain text, <code>field_location</code>), Featured (boolean, <code>field_featured</code>), Category (taxonomy reference to vocabulary "Event category", multiple values), Image (media reference). Create 3 events. Make the Teaser show only title and image. Add a Pathauto pattern <code>/events/[node:title]</code>.</div>
+<div class="box ans"><b>Answer (steps):</b>
+<ol>
+<li>Install pathauto (Exercise 2.1). Create vocabulary first: <b>Structure &rarr; Taxonomy &rarr; Add vocabulary</b> "Event category"; add terms Music, Tech, Sports.</li>
+<li><b>Structure &rarr; Content types &rarr; Add content type</b> "Event". Save and go to Manage fields.</li>
+<li>Add fields: Date &rarr; "Date range" (<code>event_date</code>); Text (plain) &rarr; <code>location</code>; Boolean &rarr; <code>featured</code>; Reference &rarr; Taxonomy term &rarr; <code>category</code> (choose vocabulary, unlimited); Reference &rarr; Media &rarr; <code>image</code> (Image media type).</li>
+<li><b>Manage display</b> &rarr; scroll to "Custom display settings" &rarr; ensure Teaser is checked &rarr; open the Teaser tab &rarr; hide all except title (the title is shown by the node template) and Image (formatter "Rendered entity" or an image style). Save.</li>
+<li><b>Configuration &rarr; Search and metadata &rarr; URL aliases &rarr; Patterns &rarr; Add</b>: Pattern type "Content", pattern <code>/events/[node:title]</code>, select bundle Event.</li>
+<li><b>Content &rarr; Add content &rarr; Event</b> three times.</li>
+</ol></div>
+
+<h1>5. Views</h1>
+<h2>5.1 Meaning</h2>
+<p><b>Views</b> is a query builder with a UI (in core). It builds a SQL query against entities, applies filters and sorts, and renders the result as a page, block, feed, or other display. </p>
+<div class="box"><b>Interview one-liner:</b> "Views lets site builders create lists and reports without writing SQL or PHP. You choose the base table, fields, filters, sorts, relationships and a display such as a page or block."</div>
+
+<h2>5.2 Views vocabulary</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>View</td><td>The saved configuration (a config entity).</td></tr>
+<tr><td>Display</td><td>An output of the view: Page, Block, Feed, Attachment, Embed, REST export, Entity reference.</td></tr>
+<tr><td>Format</td><td>The layout: Unformatted list, Table, Grid, HTML list, Responsive grid, Serializer.</td></tr>
+<tr><td>Row style</td><td>Whether rows show Fields or rendered Content (entity in a view mode).</td></tr>
+<tr><td>Fields</td><td>Columns of data.</td></tr>
+<tr><td>Filter criteria</td><td>Conditions applied to the query (fixed or exposed to visitors).</td></tr>
+<tr><td>Exposed filter</td><td>A filter shown as a form to the visitor.</td></tr>
+<tr><td>Sort criteria</td><td>ORDER BY, can also be exposed.</td></tr>
+<tr><td>Relationship</td><td>A JOIN to a related entity so you can use its fields (example: content &rarr; author).</td></tr>
+<tr><td>Contextual filter</td><td>A filter whose value comes from the URL or context (argument). Example: <code>/events/music</code>.</td></tr>
+<tr><td>Pager</td><td>Pagination (full, mini, "display a specified number", "display all").</td></tr>
+<tr><td>Header / Footer / Empty</td><td>Text or areas above, below, and when there are no results.</td></tr>
+<tr><td>Aggregation</td><td>GROUP BY with COUNT, SUM, etc.</td></tr>
+<tr><td>Rewrite results</td><td>Change a field's output using tokens like <code>{{ title }}</code>.</td></tr>
+<tr><td>Override</td><td>Setting applies to one display only, not "All displays".</td></tr>
+</table>
+
+<h2>5.3 Create a view (navigation)</h2>
+<ol>
+<li><b>Structure &rarr; Views &rarr; Add view</b> (<code>/admin/structure/views/add</code>).</li>
+<li>View name; Show: Content of type Event sorted by Newest first.</li>
+<li>Tick <b>Create a page</b>: title, path <code>events</code>, display format (Table or Grid of fields), items per page.</li>
+<li>Tick <b>Create a block</b> (optional): items 3.</li>
+<li><b>Save and edit</b>.</li>
+</ol>
+<h3>The editing screen</h3>
+<ul>
+<li>Top: displays list. Left column: Title, Format, Fields, Filter, Sort. Right: Advanced (contextual filters, relationships, exposed form, query settings, caching, header, footer, no results).</li>
+<li>Click <b>Add</b> next to Fields / Filter criteria / Sort criteria, search by name, tick it, <b>Add and configure</b>.</li>
+<li>The dropdown <b>For: All displays / This page (override)</b> decides scope. Choose carefully.</li>
+<li>Bottom <b>Preview</b>, with "Auto preview" ticked, shows results as you edit.</li>
+<li>Always click <b>Save</b>.</li>
+</ul>
+
+<h2>5.4 Exposed filter example (Category)</h2>
+<ol>
+<li>Filter criteria &rarr; Add &rarr; "Event: Category (field_category)" &rarr; Add and configure.</li>
+<li>Tick <b>Expose this filter to visitors</b>. Set "Filter type to expose": Dropdown. Label: Category. Tick "Limit list to selected items" optional.</li>
+<li>Apply. Exposed form settings: Advanced &rarr; Exposed form &rarr; Exposed form style "Basic", change "Submit button text" to "Search".</li>
+</ol>
+
+<h2>5.5 Contextual filter example (category in URL)</h2>
+<ol>
+<li>Advanced &rarr; Contextual filters &rarr; Add &rarr; "Content: Has taxonomy term ID".</li>
+<li>"When the filter value is NOT in the URL": Display all results / Hide view / Provide default value.</li>
+<li>"When the filter value IS in the URL": validation criteria "Taxonomy term" so a bad ID shows "page not found".</li>
+<li>Page path: <code>events/%</code>. Visiting <code>/events/3</code> filters by term 3.</li>
+</ol>
+
+<h2>5.6 Relationship example</h2>
+<p>Show event author name: Advanced &rarr; Relationships &rarr; Add &rarr; "Content author" &rarr; then add field "User: Name", choosing the relationship "author". Without a relationship, you can only use fields of the base entity.</p>
+
+<h2>5.7 Useful Views settings</h2>
+<ul>
+<li><b>Query settings &rarr; Disable SQL rewriting</b>: use rarely; it bypasses node access (security risk).</li>
+<li><b>Caching</b>: Tag based (default); Time based for heavy views. </li>
+<li><b>Access</b>: Permission or Role. Always set it on pages.</li>
+<li><b>Use AJAX</b>: updates the list without reloading the page.</li>
+<li><b>Show SQL query</b>: enable at <code>/admin/structure/views/settings</code> for debugging.</li>
+<li><b>Distinct</b>: removes duplicates (caused by multi-value fields in joins).</li>
+<li><b>Machine name / Path / Menu</b>: A page display can add itself to a menu (Menu: Normal menu entry).</li>
+<li><b>Contextual links</b> and <b>Field rewriting</b> let you control markup. </li>
+</ul>
+
+<h2>5.8 Common Views mistakes (interview-worthy)</h2>
+<ul>
+<li>Editing "All displays" when you meant only one display.</li>
+<li>Duplicate rows (multi-value fields, relationships) &rarr; fix with Distinct or aggregation.</li>
+<li>Forgetting Published = Yes filter, which shows unpublished content to editors in a public list.</li>
+<li>Forgetting that views cache: after a change that doesn't appear, check caching and clear caches.</li>
+</ul>
+
+<h2>Exercise 5.1 &mdash; Upcoming events view</h2>
+<div class="box ex"><b>Task:</b> Create a view "Upcoming events": page at <code>/events</code> as a table (Title linked, Date, Location, Image), only published Events whose date is today or later, sorted by date ascending, an exposed Category filter, "No events found" text, and a block with the next 3 events. Make a second page <code>/events/%</code> filtering by category ID.</div>
+<div class="box ans"><b>Answer (steps):</b>
+<ol>
+<li>Add view &rarr; Show Content of type Event &rarr; sort "Unsorted" (you will add your own) &rarr; Create a page, path <code>events</code>, display format Table of fields, 10 items &rarr; Create a block, 3 items &rarr; Save and edit.</li>
+<li>Fields: add Event date, Location, Image (Media), keep Title (check "Link to content").</li>
+<li>Filter criteria: keep Published (=Yes) and Content type = Event. Add "Event date (field_event_date)" &rarr; operator "Is greater than or equal to" &rarr; value type "An offset from the current time" &rarr; value <code>now</code> (use the start field). </li>
+<li>Sort criteria: add Event date ascending (use "For: All displays").</li>
+<li>Expose Category filter (5.4) &mdash; For: <b>This page (override)</b> so the block stays simple.</li>
+<li>Advanced &rarr; No results behavior &rarr; Add "Global: Text area" &rarr; "No events found."</li>
+<li>Block display: Pager &rarr; "Display a specified number of items | 3" (This block override). Footer &rarr; Add Global Text area with a link to <code>/events</code>.</li>
+<li>Contextual filter for term ID with path <code>events/%</code>: Duplicate the page display, change path to <code>events/%</code>, override contextual filters for this display only.</li>
+<li>Save. Test.</li>
+</ol></div>
+
+<h1>6. Taxonomy, menus, blocks, media</h1>
+<h2>6.1 Taxonomy</h2>
+<p><b>Meaning:</b> a classification system. A <b>vocabulary</b> contains <b>terms</b>. Terms can be hierarchical.</p>
+<ul>
+<li><b>Create:</b> Structure &rarr; Taxonomy &rarr; Add vocabulary &rarr; Add terms.</li>
+<li><b>Hierarchy:</b> List terms tab &rarr; drag a term under another.</li>
+<li><b>Use:</b> add a Reference &rarr; Taxonomy term field to a content type (widgets: autocomplete (tags style), select, check boxes/radios).</li>
+<li>Term pages at <code>/taxonomy/term/ID</code> come from the core view "Taxonomy term".</li>
+<li><b>Tags vs categories:</b> tags are free-form (autocomplete with create-on-the-fly); categories are a controlled list.</li>
+</ul>
+
+<h2>6.2 Menus</h2>
+<ul>
+<li>Core menus: Main navigation, Footer, Administration, Tools, User account.</li>
+<li><b>Add a link:</b> Structure &rarr; Menus &rarr; Main navigation &rarr; Add link: Title, Link (<code>/events</code> or start typing a title), Enabled, Show as expanded, Parent, Weight.</li>
+<li><b>From a node:</b> Node edit form &rarr; Menu settings &rarr; Provide a menu link.</li>
+<li><b>Display:</b> a menu is only visible after its block is placed (6.3).</li>
+<li>Menu links can be defined in code with <code>*.links.menu.yml</code>.</li>
+</ul>
+
+<h2>6.3 Blocks and regions</h2>
+<ul>
+<li><b>Place a block:</b> Structure &rarr; Block layout &rarr; choose the theme tab &rarr; <b>Place block</b> next to a region &rarr; pick block &rarr; configure title, <b>Visibility</b> (pages, content types, roles, languages) &rarr; Save &rarr; Save blocks.</li>
+<li><b>Custom block (block content):</b> Content &rarr; Blocks &rarr; Add content block (e.g. "Basic block" with Body). Reusable blocks can be placed multiple times. Non-reusable ones belong to a single place (Layout Builder).</li>
+<li><b>Block types:</b> Structure &rarr; Block content types, to add fields to custom blocks.</li>
+<li><b>Views blocks</b> appear in the block list as "Views: &lt;view name&gt;".</li>
+<li><b>Layout Builder</b> (core): per-content-type or per-node drag-and-drop layouts. Enable <code>layout_builder</code> and <code>layout_discovery</code>. Then Manage display &rarr; tick "Use Layout Builder".</li>
+</ul>
+
+<h2>6.4 Media</h2>
+<ul>
+<li>Enable <b>Media</b> and <b>Media Library</b> modules (default in Standard profile).</li>
+<li><b>Media types:</b> Structure &rarr; Media types (Image, Document, Audio, Video, Remote video). Each is a bundle with source field and extra fields (alt, caption).</li>
+<li><b>Add media:</b> Content &rarr; Media &rarr; Add media.</li>
+<li><b>Use:</b> Add a "Media" reference field; widget "Media library".</li>
+<li><b>Image styles:</b> Configuration &rarr; Media &rarr; Image styles. Define scale/crop/convert (e.g. 400x300 WebP) and select it in the formatter. Responsive image styles give srcset.</li>
+</ul>
+
+<h2>6.5 Text formats and CKEditor 5</h2>
+<ul>
+<li>Configuration &rarr; Content authoring &rarr; Text formats and editors.</li>
+<li><b>Basic HTML</b>, <b>Restricted HTML</b> (no editor, anonymous users), <b>Full HTML</b> (trusted roles only).</li>
+<li>Each format has an editor toolbar and an allowed-HTML filter. A security rule: never give anonymous users Full HTML.</li>
+</ul>
+
+<h2>Exercise 6.1</h2>
+<div class="box ex"><b>Task:</b> (1) Add "Events" to the main menu. (2) Make Tech a child of a "Topics" term. (3) Create a custom block "Welcome" and show it only on the front page, in the sidebar. (4) Create an image style "Event card" (scale and crop 400x300, WebP) and use it for the Event image in Teaser.</div>
+<div class="box ans"><b>Answer:</b>
+<ol>
+<li>Structure &rarr; Menus &rarr; Main navigation &rarr; Add link, title Events, link <code>/events</code>, Save.</li>
+<li>Structure &rarr; Taxonomy &rarr; Event category &rarr; List terms &rarr; drag Tech to the right under the parent term.</li>
+<li>Content &rarr; Blocks &rarr; Add content block &rarr; Basic block, "Welcome" &rarr; Save. Structure &rarr; Block layout &rarr; Place block in Sidebar &rarr; Visibility &rarr; Pages &rarr; <code>&lt;front&gt;</code> &rarr; "Show for the listed pages".</li>
+<li>Configuration &rarr; Media &rarr; Image styles &rarr; Add &rarr; "event_card" &rarr; Add effect "Scale and crop" 400x300, Add effect "Convert" webp &rarr; Create. Then Manage display &rarr; Teaser &rarr; Image field formatter &rarr; choose the style.</li>
+</ol></div>
+
+<h1>7. Users, roles, permissions</h1>
+<h2>7.1 Meaning</h2>
+<ul>
+<li><b>User</b> = an account (an entity). <b>User 1</b> (uid 1) bypasses all access checks.</li>
+<li><b>Role</b> = a set of permissions. Built-in: <b>Anonymous</b>, <b>Authenticated</b> (every logged-in user inherits it), and <b>Administrator</b>.</li>
+<li><b>Permission</b> = a single allowed action, provided by modules (e.g. "Event: Create new content").</li>
+</ul>
+<div class="box"><b>Interview one-liner:</b> "Permissions are granted to roles, and roles are assigned to users, never permissions directly to users. Anonymous and Authenticated are separate built-in roles: a logged-in user does not inherit the Anonymous role's permissions, only Authenticated plus any extra roles assigned."</div>
+
+<h2>7.2 Navigation</h2>
+<ul>
+<li><b>Add role:</b> People &rarr; Roles &rarr; Add role (<code>/admin/people/roles/add</code>).</li>
+<li><b>Permissions grid:</b> People &rarr; Permissions (<code>/admin/people/permissions</code>) or per role (<code>/admin/people/permissions/ROLE</code>).</li>
+<li><b>Add user:</b> People &rarr; Add user. Assign roles on the form.</li>
+<li><b>Registration settings:</b> Configuration &rarr; People &rarr; Account settings. Choose "Administrators only", "Visitors", or "Visitors, but administrator approval is required".</li>
+<li><b>Blocking:</b> edit a user &rarr; Status: Blocked. Cancel account options exist in the same form.</li>
+</ul>
+
+<h2>7.3 Node access vs permissions</h2>
+<p>Permissions are global ("can edit any Event"). <b>Node access</b> (grants) adds per-node rules (private content, Content Access/Group modules). Views applies node access automatically (that is why "Disable SQL rewriting" is dangerous).</p>
+
+<h2>7.4 Access in code (preview of Chapter 11)</h2>
+<pre><code>requirements:
+  _permission: 'access content'     # in routing.yml
+requirements:
+  _role: 'editor'
+requirements:
+  _entity_access: 'node.view'
+requirements:
+  _custom_access: '\Drupal\mymod\Access\Foo::access'</code></pre>
+
+<h2>Exercise 7.1</h2>
+<div class="box ex"><b>Task:</b> Create a role "Editor" that can create/edit own Events and see unpublished content but cannot administer anything. Create user "editor1" with that role and test in a private window.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush role:create editor "Editor"
+ddev drush role:perm:add editor "access content overview,create event content,edit own event content,delete own event content,view own unpublished content,access toolbar"
+ddev drush user:create editor1 --mail="e1@example.com" --password="Pass123!"
+ddev drush user:role:add editor editor1</code></pre>
+Or in the UI: People &rarr; Roles &rarr; Add role "Editor" &rarr; Permissions grid &rarr; tick the Event rows &rarr; Save. People &rarr; Add user &rarr; assign Editor. Open a private window, log in as editor1, visit <code>/node/add/event</code> (allowed) and <code>/admin/structure</code> (Access denied).</div>
+
+<h1>8. Modules, themes, configuration management, recipes</h1>
+<h2>8.1 Install modules and themes</h2>
+<pre><code>ddev composer require drupal/admin_toolbar drupal/gin drupal/gin_toolbar
+ddev drush en admin_toolbar admin_toolbar_tools gin_toolbar -y
+ddev drush theme:install gin -y
+ddev drush config:set system.theme admin gin -y
+ddev drush cr</code></pre>
+<p>UI: <b>Extend</b> &rarr; tick module &rarr; Install. <b>Appearance</b> &rarr; Install, then "Set as default". Admin theme: <code>/admin/appearance</code> bottom "Administration theme".</p>
+<p><b>Core vs contrib vs custom:</b> core ships with Drupal; contrib is on drupal.org (Composer, <code>drupal/name</code>); custom is yours.</p>
+
+<h2>8.2 Update workflow (know this by heart)</h2>
+<ol>
+<li>Back up: <code>ddev drush sql:dump &gt; before.sql</code> or <code>ddev snapshot</code>.</li>
+<li>Check: <code>ddev composer outdated "drupal/*"</code>, and <b>Reports &rarr; Available updates</b>.</li>
+<li>Update: <code>ddev composer update "drupal/core-*" --with-all-dependencies</code> (or a single module).</li>
+<li><code>ddev drush updb -y</code> (database updates).</li>
+<li><code>ddev drush cim -y</code> if config changed; <code>ddev drush cr</code>.</li>
+<li>Test; commit composer.json, composer.lock, and config.</li>
+</ol>
+
+<h2>8.3 Configuration management (CMI)</h2>
+<p><b>Meaning:</b> A system that stores site configuration in the database but allows export/import as YAML files so changes move from development &rarr; staging &rarr; production under version control.</p>
+<h3>Setup</h3>
+<p>In <code>web/sites/default/settings.php</code>:</p>
+<pre><code>$settings['config_sync_directory'] = '../config/sync';</code></pre>
+<h3>Workflow</h3>
+<pre><code>ddev drush cex -y      # export DB config to config/sync/*.yml
+git add config/ && git commit -m "Add Event content type"
+# on another environment
+git pull && ddev composer install
+ddev drush updb -y
+ddev drush cim -y      # import YAML into DB
+ddev drush cr
+ddev drush config:status   # show differences</code></pre>
+<h3>Related commands</h3>
+<table>
+<tr><th>Command</th><th>Use</th></tr>
+<tr><td><code>drush config:get system.site</code></td><td>Read one config object</td></tr>
+<tr><td><code>drush config:set system.site name "My Site" -y</code></td><td>Change one value</td></tr>
+<tr><td><code>drush config:status</code></td><td>List differences between DB and files</td></tr>
+<tr><td><code>drush config:delete name</code></td><td>Delete a config object</td></tr>
+<tr><td><code>drush config:export --diff</code></td><td>Preview before export</td></tr>
+</table>
+<h3>Key facts for interviews</h3>
+<ul>
+<li>Config files live in <code>config/sync</code>; the site <b>UUID</b> must match between environments or import fails. Set once: <code>drush config:set system.site uuid XXXX</code> (only for a fresh site cloned from the same codebase).</li>
+<li><b>Config Split</b> (contrib) keeps environment-specific config (dev modules like devel, stage_file_proxy) separate.</li>
+<li><b>Config Ignore</b> (contrib) excludes config you do not want overwritten.</li>
+<li><b>Config overrides</b> in <code>settings.php</code> via <code>$config['system.site']['name'] = 'X';</code> never appear in the UI or export.</li>
+<li><b>Active config</b> = in DB; <b>sync directory</b> = YAML files. Config is not content, so nodes, users, terms are not exported.</li>
+<li><b>Default config</b> in modules sits in <code>config/install</code> (imported on module install) and <code>config/optional</code> (imported if dependencies exist). <code>config/schema/*.schema.yml</code> describes the structure of config.</li>
+</ul>
+
+<h2>8.4 Recipes (new in Drupal 10.3+, standard in 11)</h2>
+<p><b>Meaning:</b> A recipe is a reusable, composable package that applies config, installs modules, and can add content. It is applied once; it is not an ongoing dependency like a module.</p>
+<pre><code>ddev composer require drupal/drupal_cms_blog     # example recipe package
+ddev drush recipe ../recipes/drupal_cms_blog     # apply via Drush
+# or without Drush
+ddev exec php core/scripts/drupal recipe ../recipes/my_recipe</code></pre>
+<p>A recipe has <code>recipe.yml</code> with <code>name</code>, <code>type</code>, <code>recipes:</code>, <code>install:</code>, and <code>config:</code> sections (<code>config: import:</code> and <code>actions:</code>). Recipes live in the <code>recipes/</code> folder you already have.</p>
+<div class="box"><b>Recipe vs install profile vs module:</b> a profile is chosen once at install and lives for the site's lifetime; a module is ongoing code; a recipe runs once to configure the site.</div>
+
+<h2>8.5 Project template files</h2>
+<ul>
+<li><code>*.info.yml</code> describes a module/theme (name, type, core_version_requirement, dependencies).</li>
+<li><code>*.libraries.yml</code> declares CSS/JS bundles (asset libraries).</li>
+<li><code>*.routing.yml</code>, <code>*.services.yml</code>, <code>*.permissions.yml</code>, <code>*.links.menu.yml</code>, <code>*.links.task.yml</code>, <code>*.links.action.yml</code>, <code>*.module</code>, <code>*.install</code>.</li>
+</ul>
+
+<h2>Exercise 8.1</h2>
+<div class="box ex"><b>Task:</b> Export your Event content type to code, then delete the content type in the UI, and restore it by importing.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code># 1 set path in settings.php: $settings['config_sync_directory'] = '../config/sync';
+ddev drush cex -y
+ls config/sync | grep event          # field.storage.node.field_*, node.type.event, ...
+# 2 delete content type in UI (Structure > Content types > Event > Delete) - first delete event nodes
+# 3 restore
+ddev drush cim -y
+ddev drush cr</code></pre>
+The content type and its fields reappear, but the deleted event nodes do not (content is not config).</div>
+

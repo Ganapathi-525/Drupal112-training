@@ -1,0 +1,420 @@
+<h1>9. Popular contributed modules and site-building tools</h1>
+<p>Interviewers ask "which modules do you use and why?". Learn the purpose of each, and how to install: <code>ddev composer require drupal/NAME &amp;&amp; ddev drush en NAME -y</code>.</p>
+<table>
+<tr><th>Module</th><th>Purpose / when to use</th></tr>
+<tr><td><b>Pathauto</b> (+ Token)</td><td>Auto-generate URL aliases from patterns. Use on every content site for SEO-friendly URLs.</td></tr>
+<tr><td><b>Admin Toolbar</b></td><td>Dropdown admin menu for faster navigation.</td></tr>
+<tr><td><b>Gin</b> (+ Gin Toolbar)</td><td>Modern admin theme.</td></tr>
+<tr><td><b>Paragraphs</b></td><td>Flexible page building: editors stack reusable components (text, image, slider) inside a field.</td></tr>
+<tr><td><b>Webform</b></td><td>Forms, surveys, submissions, emails, exports. Use for contact/registration forms.</td></tr>
+<tr><td><b>Metatag</b></td><td>Meta tags and Open Graph for SEO and social sharing.</td></tr>
+<tr><td><b>Redirect</b></td><td>301 redirects and automatic redirect when an alias changes.</td></tr>
+<tr><td><b>Simple XML Sitemap</b></td><td>Generates sitemap.xml.</td></tr>
+<tr><td><b>Devel</b></td><td>Debug helpers, generate dummy content (<code>drush devel-generate:content 20</code>). Dev environments only.</td></tr>
+<tr><td><b>Views Bulk Operations (VBO)</b></td><td>Bulk actions on view rows.</td></tr>
+<tr><td><b>Config Split / Config Ignore</b></td><td>Environment-specific configuration.</td></tr>
+<tr><td><b>Search API</b> (+ Solr/Database backend)</td><td>Full-text search with facets.</td></tr>
+<tr><td><b>Facets</b></td><td>Faceted filtering on search results.</td></tr>
+<tr><td><b>Token</b></td><td>Placeholders like <code>[node:title]</code> used by Pathauto, Metatag, Webform.</td></tr>
+<tr><td><b>Entity Reference Revisions</b></td><td>Needed by Paragraphs.</td></tr>
+<tr><td><b>Group</b> / <b>Content Access</b></td><td>Per-group or per-node access control.</td></tr>
+<tr><td><b>Easy Breadcrumb</b></td><td>Better breadcrumbs.</td></tr>
+<tr><td><b>Honeypot / reCAPTCHA / Antibot</b></td><td>Spam protection for forms.</td></tr>
+<tr><td><b>Upgrade Status</b></td><td>Checks readiness for the next major Drupal version.</td></tr>
+<tr><td><b>Key / Encrypt</b></td><td>Safe storage of secrets.</td></tr>
+<tr><td><b>Scheduler</b></td><td>Schedule publish/unpublish.</td></tr>
+<tr><td><b>Redis / Memcache</b></td><td>External cache backends.</td></tr>
+<tr><td><b>Stage File Proxy</b></td><td>Load missing files from production on local sites.</td></tr>
+<tr><td><b>Automatic Updates / Project Browser</b></td><td>Browse and install modules from the UI (Project Browser) and automated secure core updates.</td></tr>
+</table>
+<h3>Key core modules to know</h3>
+<table>
+<tr><th>Core module</th><th>Meaning</th></tr>
+<tr><td>Views, Views UI</td><td>Lists and reports</td></tr>
+<tr><td>Field, Field UI</td><td>Fields and their admin UI</td></tr>
+<tr><td>Layout Builder, Layout Discovery</td><td>Drag-and-drop layouts</td></tr>
+<tr><td>Media, Media Library</td><td>Reusable media</td></tr>
+<tr><td>Content Moderation, Workflows</td><td>Editorial states</td></tr>
+<tr><td>Language, Content Translation, Interface Translation, Configuration Translation</td><td>Multilingual</td></tr>
+<tr><td>JSON:API, REST, Serialization, Basic Auth</td><td>Web services and headless</td></tr>
+<tr><td>Migrate, Migrate Drupal</td><td>Data import</td></tr>
+<tr><td>Navigation</td><td>New left sidebar admin menu</td></tr>
+<tr><td>Help, Database Logging, Syslog</td><td>Docs and logs</td></tr>
+<tr><td>BigPipe, Dynamic Page Cache, Internal Page Cache</td><td>Performance</td></tr>
+<tr><td>Update Manager</td><td>Reports available updates</td></tr>
+<tr><td>CKEditor 5</td><td>Rich text editor</td></tr>
+<tr><td>Config, Config Translation</td><td>CMI UI</td></tr>
+<tr><td>Contextual, Toolbar, Shortcut</td><td>Editor conveniences</td></tr>
+<tr><td>Single Directory Components (SDC)</td><td>Component-based theming</td></tr>
+<tr><td>Workspaces</td><td>Stage content changes in an isolated workspace</td></tr>
+<tr><td>Datetime Range, Responsive Image, Block Content, Taxonomy, Path, Path Alias, Search, Statistics, Tour, History</td><td>Misc. site building</td></tr>
+</table>
+
+<h2>Exercise 9.1</h2>
+<div class="box ex"><b>Task:</b> Install Admin Toolbar, Paragraphs, Metatag and Webform. Create a contact form with name, email, message and an email to the admin.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev composer require drupal/admin_toolbar drupal/paragraphs drupal/metatag drupal/webform
+ddev drush en admin_toolbar admin_toolbar_tools paragraphs metatag webform webform_ui -y
+ddev drush cr</code></pre>
+Navigate: Structure &rarr; Webforms &rarr; Add webform (<code>/admin/structure/webform/add</code>) &rarr; title "Contact" &rarr; Build tab &rarr; Add element: Name (Text field), Email, Message (Text area) &rarr; Settings &rarr; Emails/Handlers &rarr; Add handler "Email" &rarr; To: admin email. Open <code>/form/contact</code> and submit. View submissions in the Results tab; check email at <code>ddev mailpit</code>.</div>
+
+<h1>10. Theming with Twig</h1>
+<h2>10.1 Meaning</h2>
+<p>A <b>theme</b> controls presentation: templates (Twig), styles (CSS), scripts (JS), and regions. Core themes in Drupal 11: <b>Olivero</b> (default front end), <b>Claro</b> (admin), <b>Stark</b> (bare, for learning), <b>Starterkit</b> (generator for new themes), <b>Stable9</b> (stable markup base). </p>
+<div class="box"><b>Interview one-liner:</b> "Themes use the Twig template engine. A theme declares regions and asset libraries in YAML, overrides core markup by copying a template to the theme, and uses preprocess functions to prepare variables."</div>
+
+<h2>10.2 Create a custom theme from Starterkit (the Drupal 11 way)</h2>
+<pre><code>ddev exec php core/scripts/drupal generate-theme my_theme --path themes/custom
+# result: web/themes/custom/my_theme/
+ddev drush theme:install my_theme -y
+ddev drush config:set system.theme default my_theme -y
+ddev drush cr</code></pre>
+<p>Starterkit copies a clean theme that does not depend on Olivero afterwards (it is "forked", no base-theme inheritance).</p>
+
+<h2>10.3 Theme file anatomy</h2>
+<pre><code>web/themes/custom/my_theme/
+  my_theme.info.yml        # name, type, base theme, regions, libraries
+  my_theme.libraries.yml   # asset libraries (css/js)
+  my_theme.theme           # preprocess functions (PHP)
+  css/style.css
+  js/app.js
+  templates/               # twig overrides
+    node--event--teaser.html.twig
+    page.html.twig
+  components/              # single directory components (SDC)
+  logo.svg, screenshot.png</code></pre>
+<h3>my_theme.info.yml</h3>
+<pre><code>name: My Theme
+type: theme
+description: Custom theme for training
+package: Custom
+core_version_requirement: ^11
+base theme: stable9        # or false to build everything yourself
+libraries:
+  - my_theme/global
+regions:
+  header: Header
+  primary_menu: Primary menu
+  content: Content
+  sidebar: Sidebar
+  footer: Footer</code></pre>
+<h3>my_theme.libraries.yml</h3>
+<pre><code>global:
+  css:
+    theme:
+      css/style.css: {}
+  js:
+    js/app.js: {}
+  dependencies:
+    - core/drupal
+    - core/once</code></pre>
+<p><b>Attach a library:</b> globally via <code>libraries:</code> in info.yml; in Twig: <code>{{ attach_library('my_theme/global') }}</code>; in PHP render array: <code>$build['#attached']['library'][] = 'my_theme/global';</code>.</p>
+
+<h2>10.4 Twig syntax (memorise)</h2>
+<table>
+<tr><th>Syntax</th><th>Meaning / example</th></tr>
+<tr><td><code>{{ var }}</code></td><td>Print a variable (auto-escaped, safe).</td></tr>
+<tr><td><code>{% if x %} ... {% endif %}</code></td><td>Logic; also <code>for</code>, <code>set</code>, <code>include</code>, <code>extends</code>, <code>block</code>.</td></tr>
+<tr><td><code>{# comment #}</code></td><td>Comment.</td></tr>
+<tr><td><code>{{ content.field_location }}</code></td><td>Render a field with its formatter.</td></tr>
+<tr><td><code>{{ content|without('field_image') }}</code></td><td>Render everything except a field.</td></tr>
+<tr><td><code>{{ label }}</code></td><td>Node title.</td></tr>
+<tr><td><code>{{ url }}</code></td><td>Node URL.</td></tr>
+<tr><td><code>{{ node.field_location.value }}</code></td><td>Raw value of a field.</td></tr>
+<tr><td><code>{{ 'Hello'|t }}</code></td><td>Translate a string.</td></tr>
+<tr><td><code>{{ path('entity.node.canonical', {'node': 1}) }}</code></td><td>URL from route name.</td></tr>
+<tr><td><code>{{ attributes.addClass('card') }}</code></td><td>Add a CSS class.</td></tr>
+<tr><td><code>{{ dump(var) }}</code></td><td>Debug (with Twig debug on).</td></tr>
+<tr><td><code>|raw</code></td><td>Output unescaped HTML. Avoid; XSS risk.</td></tr>
+<tr><td><code>{% include '@my_theme/partials/card.html.twig' with {title: label} %}</code></td><td>Include a partial.</td></tr>
+</table>
+
+<h2>10.5 Template suggestions and debugging</h2>
+<p>Drupal picks the most specific template name. Order for a teaser Event node:</p>
+<pre><code>node--event--teaser.html.twig
+node--event.html.twig
+node--teaser.html.twig
+node.html.twig</code></pre>
+<p>Naming rules: double dash <code>--</code> separates specificity levels; underscores in machine names turn into hyphens in file names.</p>
+<h3>Turn on Twig debug (dev only)</h3>
+<pre><code>cp web/sites/default/default.services.yml web/sites/default/services.yml
+# edit services.yml under twig.config:
+#   debug: true
+#   auto_reload: true
+#   cache: false
+ddev drush cr</code></pre>
+<p>View page source: HTML comments list "THEME DEBUG", "FILE NAME SUGGESTIONS" (the <code>x</code> marks the one in use), and "BEGIN OUTPUT from ...". Copy that core template into your theme's <code>templates/</code> and edit it.</p>
+<div class="box warn">Disable these settings on production. Twig cache off makes the site slow.</div>
+
+<h2>10.6 Preprocess functions</h2>
+<pre><code>// my_theme.theme
+function my_theme_preprocess_node(array &amp;$variables) {
+  $node = $variables['node'];
+  if ($node-&gt;bundle() === 'event') {
+    $variables['is_featured'] = (bool) $node-&gt;get('field_featured')-&gt;value;
+  }
+}
+function my_theme_preprocess_page(array &amp;$variables) {
+  $variables['year'] = date('Y');
+}
+function my_theme_theme_suggestions_page_alter(array &amp;$suggestions, array $variables) {
+  if ($node = \Drupal::routeMatch()-&gt;getParameter('node')) {
+    $suggestions[] = 'page__' . $node-&gt;bundle();
+  }
+}</code></pre>
+<p>Hook naming: <code>THEMENAME_preprocess_HOOK</code>. Clear cache after adding a new function (hook discovery is cached).</p>
+
+<h2>10.7 Single Directory Components (SDC)</h2>
+<p><b>Meaning:</b> A component bundles its Twig, CSS, JS, schema, and metadata in one folder. Stable since Drupal 10.3. Reusable and documented.</p>
+<pre><code>themes/custom/my_theme/components/card/
+  card.component.yml
+  card.twig
+  card.css
+  card.js        (optional)</code></pre>
+<pre><code># card.component.yml
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Card
+status: stable
+props:
+  type: object
+  properties:
+    title: { type: string, title: Title }
+slots:
+  body: { title: Body }</code></pre>
+<pre><code>{# card.twig #}
+&lt;article {{ attributes.addClass('card') }}&gt;
+  &lt;h3&gt;{{ title }}&lt;/h3&gt;
+  {% block body %}{{ body }}{% endblock %}
+&lt;/article&gt;</code></pre>
+<p>Use it in any template: <code>{{ include('my_theme:card', {title: label}) }}</code> or <code>{% embed 'my_theme:card' with {title: label} %}{% block body %}...{% endblock %}{% endembed %}</code>. CSS and JS are loaded automatically when the component is rendered.</p>
+
+<h2>10.8 Responsive images, breakpoints</h2>
+<ul>
+<li><code>my_theme.breakpoints.yml</code> defines breakpoints; the Responsive Image module maps them to image styles (<code>/admin/config/media/responsive-image-style</code>) to produce <code>srcset</code>.</li>
+<li>Lazy loading is enabled by default on images in core formatters (<code>loading="lazy"</code>).</li>
+</ul>
+
+<h2>10.9 Sub-theme vs Starterkit vs base theme</h2>
+<ul>
+<li><b>Sub-theme</b>: inherits templates/CSS from a base theme via <code>base theme:</code>. Updates to the base flow in.</li>
+<li><b>Starterkit</b>: a one-time generated copy. No inheritance; you own all the code.</li>
+<li><b>Admin theme</b>: used for admin pages; set at Appearance &rarr; Administration theme.</li>
+</ul>
+
+<h2>Exercise 10.1</h2>
+<div class="box ex"><b>Task:</b> Generate a theme "my_theme", make it default, add a footer with the current year, and override the Event teaser template to show title, date and location in a styled card (use the CSS file). </div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev exec php core/scripts/drupal generate-theme my_theme --path themes/custom
+ddev drush theme:install my_theme -y &amp;&amp; ddev drush config:set system.theme default my_theme -y</code></pre>
+<p>Create <code>templates/node--event--teaser.html.twig</code>:</p>
+<pre><code>{{ attach_library('my_theme/global') }}
+&lt;article{{ attributes.addClass('event-card') }}&gt;
+  &lt;h2&gt;&lt;a href="{{ url }}"&gt;{{ label }}&lt;/a&gt;&lt;/h2&gt;
+  &lt;div class="event-card__date"&gt;{{ content.field_event_date }}&lt;/div&gt;
+  &lt;div class="event-card__place"&gt;{{ content.field_location }}&lt;/div&gt;
+&lt;/article&gt;</code></pre>
+<p>Add to <code>css/style.css</code>: <code>.event-card{border:1px solid #ddd;border-radius:8px;padding:1rem;margin-bottom:1rem}</code>. For the footer year, add the preprocess function from 10.6 and print <code>{{ year }}</code> in <code>page.html.twig</code>. Run <code>ddev drush cr</code> and view <code>/events</code> (the view must use "Content: Teaser" row style).</p></div>
+
+<h1>11. Custom module development</h1>
+<h2>11.1 Prerequisites you must know</h2>
+<ul>
+<li><b>PHP OOP:</b> classes, namespaces (<code>namespace Drupal\my_module\Controller;</code>), interfaces, inheritance, traits, constructor promotion, type declarations, attributes.</li>
+<li><b>PSR-4 autoloading:</b> <code>Drupal\my_module\Foo</code> maps to <code>web/modules/custom/my_module/src/Foo.php</code>.</li>
+<li><b>YAML</b> for configuration files.</li>
+</ul>
+
+<h2>11.2 Create the module</h2>
+<pre><code>ddev drush generate module     # interactive scaffold (Drush Generators)
+# or manually:
+mkdir -p web/modules/custom/training/src/Controller</code></pre>
+<p><code>training.info.yml</code>:</p>
+<pre><code>name: Training
+type: module
+description: Training examples.
+package: Custom
+core_version_requirement: ^11
+dependencies:
+  - drupal:node</code></pre>
+<pre><code>ddev drush en training -y</code></pre>
+
+<h2>11.3 Routing + Controller (a page)</h2>
+<p><code>training.routing.yml</code>:</p>
+<pre><code>training.hello:
+  path: '/hello/{name}'
+  defaults:
+    _controller: '\Drupal\training\Controller\HelloController::greet'
+    _title: 'Hello page'
+    name: 'World'
+  requirements:
+    _permission: 'access content'</code></pre>
+<p><code>src/Controller/HelloController.php</code>:</p>
+<pre><code>&lt;?php
+namespace Drupal\training\Controller;
+
+use Drupal\Core\Controller\ControllerBase;
+
+class HelloController extends ControllerBase {
+  public function greet(string $name): array {
+    return [
+      '#markup' =&gt; $this-&gt;t('Hello, @name!', ['@name' =&gt; $name]),
+    ];
+  }
+}</code></pre>
+<p>Visit <code>/hello/Sam</code> after <code>ddev drush cr</code>. Route parts: <b>path</b>, <b>defaults</b> (what runs), <b>requirements</b> (access), <b>options</b> (e.g. <code>_admin_route: TRUE</code>, parameter converters). <code>{name}</code> is a route parameter passed to the method by name.</p>
+<h3>Route access requirement options</h3>
+<pre><code>_permission: 'administer nodes'
+_role: 'editor'
+_user_is_logged_in: 'TRUE'
+_access: 'TRUE'                       # public
+_entity_access: 'node.update'         # with {node} param
+_custom_access: '\Drupal\training\Access\Check::access'</code></pre>
+
+<h2>11.4 Menu link, local task, action</h2>
+<pre><code># training.links.menu.yml
+training.hello_link:
+  title: 'Hello'
+  route_name: training.hello
+  menu_name: main
+  weight: 10
+
+# training.links.task.yml  (tabs)
+# training.links.action.yml (buttons like "+ Add")</code></pre>
+
+<h2>11.5 Permissions</h2>
+<pre><code># training.permissions.yml
+administer training settings:
+  title: 'Administer training settings'
+  description: 'Change training module settings.'
+  restrict access: true</code></pre>
+
+<h2>11.6 A custom Block plugin</h2>
+<pre><code>&lt;?php
+namespace Drupal\training\Plugin\Block;
+
+use Drupal\Core\Block\Attribute\Block;
+use Drupal\Core\Block\BlockBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+#[Block(
+  id: 'training_latest_events',
+  admin_label: new TranslatableMarkup('Latest events'),
+  category: new TranslatableMarkup('Training'),
+)]
+class LatestEventsBlock extends BlockBase {
+  public function build(): array {
+    return [
+      '#markup' =&gt; $this-&gt;t('Latest events go here'),
+      '#cache' =&gt; ['max-age' =&gt; 3600],
+    ];
+  }
+}</code></pre>
+<p>Place via Structure &rarr; Block layout &rarr; Place block &rarr; category Training. Older code uses docblock <code>@Block(...)</code> annotations; Drupal 11 prefers PHP attributes.</p>
+
+<h2>11.7 Form API</h2>
+<p>Form class extends <code>FormBase</code> (general) or <code>ConfigFormBase</code> (settings stored in config).</p>
+<pre><code>&lt;?php
+namespace Drupal\training\Form;
+
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
+
+class FeedbackForm extends FormBase {
+  public function getFormId(): string { return 'training_feedback'; }
+
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+    $form['name'] = ['#type' =&gt; 'textfield', '#title' =&gt; $this-&gt;t('Name'), '#required' =&gt; TRUE];
+    $form['email'] = ['#type' =&gt; 'email', '#title' =&gt; $this-&gt;t('Email')];
+    $form['msg'] = ['#type' =&gt; 'textarea', '#title' =&gt; $this-&gt;t('Message')];
+    $form['actions']['#type'] = 'actions';
+    $form['actions']['submit'] = ['#type' =&gt; 'submit', '#value' =&gt; $this-&gt;t('Send')];
+    return $form;
+  }
+
+  public function validateForm(array &amp;$form, FormStateInterface $form_state): void {
+    if (strlen($form_state-&gt;getValue('msg')) &lt; 10) {
+      $form_state-&gt;setErrorByName('msg', $this-&gt;t('Message too short.'));
+    }
+  }
+
+  public function submitForm(array &amp;$form, FormStateInterface $form_state): void {
+    $this-&gt;messenger()-&gt;addStatus($this-&gt;t('Thanks, @n!', ['@n' =&gt; $form_state-&gt;getValue('name')]));
+    $form_state-&gt;setRedirect('&lt;front&gt;');
+  }
+}</code></pre>
+<pre><code># routing
+training.feedback:
+  path: '/feedback'
+  defaults:
+    _form: '\Drupal\training\Form\FeedbackForm'
+    _title: 'Feedback'
+  requirements:
+    _permission: 'access content'</code></pre>
+<p><b>Form lifecycle:</b> build &rarr; (user submits) &rarr; validate &rarr; submit. Common elements: <code>textfield, textarea, email, number, select, radios, checkboxes, checkbox, date, datetime, entity_autocomplete, managed_file, hidden, markup, details, fieldset, container, submit</code>. Security: Drupal adds a CSRF token (<code>form_token</code>) automatically.</p>
+<h3>Config (settings) form</h3>
+<pre><code>class SettingsForm extends ConfigFormBase {
+  protected function getEditableConfigNames() { return ['training.settings']; }
+  public function getFormId() { return 'training_settings'; }
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $config = $this-&gt;config('training.settings');
+    $form['greeting'] = ['#type' =&gt; 'textfield', '#title' =&gt; 'Greeting',
+      '#default_value' =&gt; $config-&gt;get('greeting')];
+    return parent::buildForm($form, $form_state);
+  }
+  public function submitForm(array &amp;$form, FormStateInterface $form_state) {
+    $this-&gt;config('training.settings')-&gt;set('greeting', $form_state-&gt;getValue('greeting'))-&gt;save();
+    parent::submitForm($form, $form_state);
+  }
+}</code></pre>
+<p>Provide defaults in <code>config/install/training.settings.yml</code> and a schema in <code>config/schema/training.schema.yml</code>.</p>
+
+<h2>11.8 Render arrays</h2>
+<pre><code>$build = [
+  '#theme' =&gt; 'item_list',
+  '#items' =&gt; ['One', 'Two'],
+  '#cache' =&gt; ['tags' =&gt; ['node_list'], 'contexts' =&gt; ['user.permissions'], 'max-age' =&gt; 600],
+  '#attached' =&gt; ['library' =&gt; ['my_theme/global']],
+];
+$link = ['#type' =&gt; 'link', '#title' =&gt; 'Go', '#url' =&gt; \Drupal\Core\Url::fromRoute('&lt;front&gt;')];
+$table = ['#type' =&gt; 'table', '#header' =&gt; ['A','B'], '#rows' =&gt; [[1,2],[3,4]]];</code></pre>
+<p>Properties start with <code>#</code>. <code>#markup</code> is filtered (XSS-safe); <code>#plain_text</code> escapes everything; <code>#theme</code> uses a theme hook; <code>#type</code> uses a render element.</p>
+
+<h2>11.9 Translation and escaping</h2>
+<ul>
+<li><code>$this-&gt;t('Hello @name', ['@name' =&gt; $x])</code> &mdash; <code>@</code> escapes, <code>%</code> escapes and emphasises, <code>:</code> is for URLs. <b>Never</b> concatenate user input into <code>t()</code> strings.</li>
+<li>Use <code>StringTranslationTrait</code> in services.</li>
+</ul>
+
+<h2>11.10 Install / uninstall and update hooks</h2>
+<pre><code>// training.install
+function training_schema() {          // create a custom table
+  return ['training_log' =&gt; [
+    'fields' =&gt; ['id' =&gt; ['type' =&gt; 'serial', 'not null' =&gt; TRUE],
+                 'msg' =&gt; ['type' =&gt; 'varchar', 'length' =&gt; 255, 'not null' =&gt; TRUE]],
+    'primary key' =&gt; ['id'],
+  ]];
+}
+function training_update_10001() {    // run by drush updb
+  // change schema or data here
+}</code></pre>
+
+<h2>Exercise 11.1</h2>
+<div class="box ex"><b>Task:</b> Build module "training" with (a) page <code>/hello/{name}</code>, (b) a permission-protected page <code>/admin/training</code>, (c) a Latest Events block that lists the 3 latest published Event titles, (d) a feedback form.</div>
+<div class="box ans"><b>Answer:</b> Use sections 11.2 - 11.7. For (c) replace the block's <code>build()</code> with:
+<pre><code>public function build(): array {
+  $nids = \Drupal::entityQuery('node')
+    -&gt;accessCheck(TRUE)
+    -&gt;condition('type', 'event')
+    -&gt;condition('status', 1)
+    -&gt;sort('created', 'DESC')
+    -&gt;range(0, 3)
+    -&gt;execute();
+  $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+  $items = [];
+  foreach ($nodes as $node) { $items[] = $node-&gt;toLink(); }
+  return [
+    '#theme' =&gt; 'item_list', '#items' =&gt; $items,
+    '#cache' =&gt; ['tags' =&gt; ['node_list:event']],
+  ];
+}</code></pre>
+For (b): add a route <code>training.admin</code> with path <code>/admin/training</code>, <code>_permission: 'administer training settings'</code> and <code>_admin_route: TRUE</code> in options. Run <code>ddev drush en training -y &amp;&amp; ddev drush cr</code>.</div>
+

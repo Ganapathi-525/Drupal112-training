@@ -1,0 +1,22 @@
+uuid: 59e6e110-4673-463e-a806-b41aa8757a3f
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - fashion_theme
+_core:
+  default_config_hash: erQSEZF2XUjNmgTl0uNRBzmg18ZGXwUcw2FhApoeuHk
+id: fashion_theme_content
+theme: fashion_theme
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

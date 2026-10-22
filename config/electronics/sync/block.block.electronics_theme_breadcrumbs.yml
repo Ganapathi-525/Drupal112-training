@@ -1,0 +1,22 @@
+uuid: ba36c09b-6711-4844-8a7a-e3f80689bb41
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - electronics_theme
+_core:
+  default_config_hash: VhBzWb7lMRtIOg9G7VSw_0uopi-7zXeHq4vXqqV1HFE
+id: electronics_theme_breadcrumbs
+theme: electronics_theme
+region: breadcrumb
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

@@ -1,0 +1,12 @@
+<?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function event_registration_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name === 'event_registration.form') {
+    return '<p>' . t('Register for our upcoming events.') . '</p>';
+  }
+}

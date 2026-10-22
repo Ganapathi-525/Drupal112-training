@@ -1,0 +1,7 @@
+name: Fashion Theme
+type: theme
+description: Theme for the Fashion Theme site only.
+core_version_requirement: ^11
+base theme: olivero
+libraries:
+  - fashion_theme/global

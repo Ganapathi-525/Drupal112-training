@@ -1,0 +1,5 @@
+name: 'Event Registration'
+description: 'Custom event registration form module with DEVEL/KINT debugging'
+type: module
+core_version_requirement: ^11
+package: 'Custom'

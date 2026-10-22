@@ -1,0 +1,22 @@
+uuid: 05044de6-ff47-454b-a9c9-385a5b854b83
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - electronics_theme
+_core:
+  default_config_hash: erQSEZF2XUjNmgTl0uNRBzmg18ZGXwUcw2FhApoeuHk
+id: electronics_theme_content
+theme: electronics_theme
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

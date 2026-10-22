@@ -1,0 +1,22 @@
+uuid: 44f7aebb-9394-4333-8a55-1dc1a1bb83ea
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - electronics_theme
+_core:
+  default_config_hash: eYL19CLDyinGTWYQfBD1DswWzglEotE_kHnHx3AxTXM
+id: electronics_theme_powered
+theme: electronics_theme
+region: sidebar_first
+weight: 0
+provider: null
+plugin: system_powered_by_block
+settings:
+  id: system_powered_by_block
+  label: 'Powered by Drupal'
+  label_display: '0'
+  provider: system
+visibility: {  }

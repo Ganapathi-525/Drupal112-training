@@ -1,0 +1,306 @@
+<h1>18. Drush and Composer cheat sheet</h1>
+<p>Prefix with <code>ddev</code> locally (<code>ddev drush cr</code>). Format: command &mdash; when to use.</p>
+<h2>18.1 Drush</h2>
+<table>
+<tr><th>Group</th><th>Command</th><th>When to use</th></tr>
+<tr><td rowspan="4">Basics</td><td><code>drush status</code></td><td>Check version, DB, paths</td></tr>
+<tr><td><code>drush cr</code></td><td>Any code/theme/routing/services change; "it doesn't work"</td></tr>
+<tr><td><code>drush uli [--uid=2]</code></td><td>Login link; forgot password</td></tr>
+<tr><td><code>drush upwd admin "NewPass1!"</code></td><td>Reset a password</td></tr>
+<tr><td rowspan="5">Modules/themes</td><td><code>drush en MODULE -y</code></td><td>Install module</td></tr>
+<tr><td><code>drush pmu MODULE -y</code></td><td>Uninstall module</td></tr>
+<tr><td><code>drush pm:list --status=enabled</code></td><td>See what is installed</td></tr>
+<tr><td><code>drush theme:install THEME</code></td><td>Install theme</td></tr>
+<tr><td><code>drush pm:security</code></td><td>Check Composer packages for security advisories</td></tr>
+<tr><td rowspan="6">Config</td><td><code>drush cex -y</code></td><td>Export config after building in UI</td></tr>
+<tr><td><code>drush cim -y</code></td><td>Import config after pulling code</td></tr>
+<tr><td><code>drush config:status</code></td><td>Show differences</td></tr>
+<tr><td><code>drush cget system.site</code></td><td>Read config</td></tr>
+<tr><td><code>drush cset system.site name "X" -y</code></td><td>Change config</td></tr>
+<tr><td><code>drush config:delete NAME</code></td><td>Delete a config item</td></tr>
+<tr><td rowspan="3">Database</td><td><code>drush updb -y</code></td><td>After code update / deploy</td></tr>
+<tr><td><code>drush sql:dump &gt; file.sql</code></td><td>Backup</td></tr>
+<tr><td><code>drush sql:cli</code> / <code>drush sql:query "SELECT ..."</code></td><td>Run SQL</td></tr>
+<tr><td rowspan="4">Users</td><td><code>drush user:create NAME --mail=... --password=...</code></td><td>Create user</td></tr>
+<tr><td><code>drush user:role:add ROLE NAME</code></td><td>Give role</td></tr>
+<tr><td><code>drush user:block NAME</code> / <code>user:unblock</code></td><td>Block/unblock</td></tr>
+<tr><td><code>drush role:perm:add ROLE "perm"</code></td><td>Grant permission</td></tr>
+<tr><td rowspan="5">Runtime</td><td><code>drush cron</code></td><td>Run cron</td></tr>
+<tr><td><code>drush ws --count=20</code> / <code>--severity=error</code> / <code>--tail</code></td><td>Read logs</td></tr>
+<tr><td><code>drush php:eval 'code'</code> (ev)</td><td>Quick PHP</td></tr>
+<tr><td><code>drush php:cli</code> (php)</td><td>Interactive shell</td></tr>
+<tr><td><code>drush state:set system.maintenance_mode 1</code></td><td>Maintenance mode</td></tr>
+<tr><td rowspan="5">Dev helpers</td><td><code>drush generate module / controller / form:simple / plugin:block / entity:content / theme / hook</code></td><td>Scaffold code</td></tr>
+<tr><td><code>drush devel-generate:content 20 --bundles=event</code></td><td>Dummy content</td></tr>
+<tr><td><code>drush views:dev</code> / <code>views:list</code></td><td>Views dev mode (disable caches)</td></tr>
+<tr><td><code>drush queue:list</code> / <code>queue:run NAME</code></td><td>Queues</td></tr>
+<tr><td><code>drush sa @alias</code>, <code>drush @prod status</code>, <code>drush rsync</code>, <code>drush sql:sync @prod @self</code></td><td>Remote operations via aliases (<code>drush/sites/*.site.yml</code>)</td></tr>
+<tr><td rowspan="3">Other</td><td><code>drush deploy</code></td><td>Runs <code>updb</code>, <code>cr</code>, <code>cim</code>, <code>cr</code>, deploy hooks in the right order. Great for pipelines.</td></tr>
+<tr><td><code>drush deploy:hook</code></td><td>Run <code>hook_deploy_NAME</code> one-time deploy code</td></tr>
+<tr><td><code>drush list</code> / <code>drush help CMD</code></td><td>Discover commands</td></tr>
+</table>
+
+<h2>18.2 Composer</h2>
+<table>
+<tr><th>Command</th><th>When to use</th></tr>
+<tr><td><code>composer require drupal/NAME</code></td><td>Add module/theme</td></tr>
+<tr><td><code>composer require --dev drupal/devel</code></td><td>Dev-only package</td></tr>
+<tr><td><code>composer remove drupal/NAME</code></td><td>Remove (after uninstalling in Drupal)</td></tr>
+<tr><td><code>composer update drupal/NAME --with-dependencies</code></td><td>Update one project</td></tr>
+<tr><td><code>composer update "drupal/core-*" --with-all-dependencies</code></td><td>Core update</td></tr>
+<tr><td><code>composer install --no-dev --optimize-autoloader</code></td><td>Production deploy</td></tr>
+<tr><td><code>composer outdated "drupal/*"</code></td><td>What can be updated</td></tr>
+<tr><td><code>composer audit</code></td><td>Security advisories</td></tr>
+<tr><td><code>composer show drupal/core</code></td><td>Installed version</td></tr>
+<tr><td><code>composer why drupal/token</code> / <code>why-not</code></td><td>Dependency reasons/blockers</td></tr>
+<tr><td><code>composer validate</code></td><td>Check composer.json</td></tr>
+<tr><td><code>composer require cweagans/composer-patches</code></td><td>Apply patches from drupal.org issues (<code>extra.patches</code> in composer.json)</td></tr>
+</table>
+
+<h2>18.3 Git (basics for projects)</h2>
+<pre><code>git status
+git add -A &amp;&amp; git commit -m "Add event type and config"
+git checkout -b feature/events
+git push -u origin feature/events
+git pull --rebase origin main
+git log --oneline -10</code></pre>
+
+<h2>18.4 Quick "when to use what" table</h2>
+<table>
+<tr><th>I need to...</th><th>Use</th></tr>
+<tr><td>list content with filters</td><td>Views</td></tr>
+<tr><td>structure data</td><td>Content type + fields</td></tr>
+<tr><td>categorise content</td><td>Taxonomy</td></tr>
+<tr><td>reusable media</td><td>Media + Media Library</td></tr>
+<tr><td>flexible landing pages</td><td>Layout Builder or Paragraphs</td></tr>
+<tr><td>forms with emails</td><td>Webform</td></tr>
+<tr><td>custom logic on content save</td><td>Hook or event subscriber</td></tr>
+<tr><td>a new page</td><td>Route + controller</td></tr>
+<tr><td>a reusable output piece</td><td>Block plugin</td></tr>
+<tr><td>a reusable function</td><td>Service</td></tr>
+<tr><td>settings page</td><td>ConfigFormBase</td></tr>
+<tr><td>change markup</td><td>Twig override + preprocess</td></tr>
+<tr><td>move site settings between environments</td><td>Config export/import</td></tr>
+<tr><td>move content</td><td>Migrate / default content / DB copy</td></tr>
+<tr><td>heavy work</td><td>Queue + cron</td></tr>
+<tr><td>expose data to an app</td><td>JSON:API / REST</td></tr>
+</table>
+
+<h1>19. Interview Q&amp;A</h1>
+<p>Answer in your own words. The short answers below are interview-length.</p>
+
+<h2>A. Basics</h2>
+<p class="q">1. What is Drupal?</p><p>An open-source PHP content management framework on Symfony, used for complex, scalable, secure sites with granular permissions and multilingual support.</p>
+<p class="q">2. What is the difference between a node, a content type and a field?</p><p>A node is one piece of content. A content type is the template/bundle defining its fields. A field is a data slot.</p>
+<p class="q">3. What is an entity? A bundle?</p><p>An entity is a data object managed by the Entity API (node, user, term, media...). A bundle is a subtype of an entity type (Article is a bundle of node).</p>
+<p class="q">4. What is the difference between content and configuration?</p><p>Configuration is site structure/settings exportable as YAML (content types, views, roles). Content is user data (nodes, users, terms) kept in the database, moved by migrations or DB copy.</p>
+<p class="q">5. What is the difference between core, contrib and custom?</p><p>Core ships with Drupal; contrib is community code on drupal.org; custom is code written for your project.</p>
+<p class="q">6. What is a block? A region?</p><p>A block is a placeable chunk of output. A region is a theme area where blocks go.</p>
+<p class="q">7. What is a view mode?</p><p>A named display configuration of an entity (Full, Teaser, Card) so the same content renders differently.</p>
+<p class="q">8. What is the difference between a widget and a formatter?</p><p>Widget = input on the edit form. Formatter = output on display.</p>
+<p class="q">9. What is a taxonomy?</p><p>A system of vocabularies containing terms used to categorise content.</p>
+<p class="q">10. What is Drupal CMS?</p><p>A pre-configured product built on Drupal core using recipes, aimed at easy site building; underneath it is the same Drupal.</p>
+<p class="q">11. What is Drupal Core's scaffold and recommended-project?</p><p><code>drupal/recommended-project</code> is the Composer template for new sites; <code>drupal/core-composer-scaffold</code> copies files like index.php into the docroot; <code>drupal/core-recommended</code> locks dependency versions.</p>
+<p class="q">12. What is the difference between Drupal 10 and 11?</p><p>Drupal 11 requires newer PHP (8.3+), updated Symfony 7, removes deprecated APIs, adds OOP hooks, attributes for plugins, Navigation, recipes and SDC maturing, and Single Directory Components.</p>
+<p class="q">13. What is a distribution, install profile, recipe?</p><p>Profile: initial setup at install. Distribution: profile plus code for a use case. Recipe: a one-time applicable package of config/modules/content.</p>
+<p class="q">14. What does <code>settings.php</code> contain?</p><p>Database credentials, hash salt, config sync directory, trusted hosts, file paths, overrides. Environment-specific; not committed with secrets.</p>
+<p class="q">15. What is the front controller?</p><p><code>web/index.php</code>, the single entry point that boots Drupal.</p>
+
+<h2>B. Site building</h2>
+<p class="q">16. How do you create a content type and add a field?</p><p>Structure &rarr; Content types &rarr; Add; Manage fields &rarr; Add field; configure widget (form display) and formatter (display).</p>
+<p class="q">17. How do you show the same content differently in two places?</p><p>Create/enable view modes and configure Manage display for each; select the mode in the view or template.</p>
+<p class="q">18. What is Views?</p><p>A UI query builder for lists, built on displays, fields, filters, sorts, relationships and contextual filters.</p>
+<p class="q">19. Contextual filter vs exposed filter?</p><p>Contextual filter takes its value from the URL/context. Exposed filter is a form control shown to the visitor.</p>
+<p class="q">20. What is a relationship in Views?</p><p>A join to a related entity so you can show its fields or filter by them.</p>
+<p class="q">21. How do you avoid duplicate rows in a View?</p><p>Enable Distinct, use aggregation, or adjust the multi-value field's "Display all values in the same row".</p>
+<p class="q">22. How do you add a view to a menu?</p><p>Page display &rarr; Page settings &rarr; Menu &rarr; Normal menu entry.</p>
+<p class="q">23. How do you display a View in a block?</p><p>Add a Block display, then place it in Structure &rarr; Block layout.</p>
+<p class="q">24. What is the difference between Layout Builder and Paragraphs?</p><p>Layout Builder arranges fields/blocks in layouts visually (per content type or per node). Paragraphs lets editors compose content from reusable component types inside a field.</p>
+<p class="q">25. Why use Media instead of an Image field?</p><p>Media entities are reusable, have metadata (alt, caption), a library UI, and support many sources (video, remote video, documents).</p>
+<p class="q">26. How do text formats protect a site?</p><p>They run filters (HTML restriction) on user input; weak formats allow XSS, so only trusted roles get Full HTML.</p>
+<p class="q">27. How do you create and use roles?</p><p>People &rarr; Roles; assign permissions on the Permissions page; assign roles to users.</p>
+<p class="q">28. What can user 1 do?</p><p>Bypasses all permission checks. Use sparingly; use an administrator role for daily work.</p>
+<p class="q">29. How do you set up URL aliases?</p><p>Manually per node or automatically with Pathauto patterns.</p>
+<p class="q">30. How do you enable moderation workflows?</p><p>Enable Workflows and Content Moderation; create/edit the Editorial workflow; attach content types; give roles transition permissions.</p>
+<p class="q">31. How do you build a contact form?</p><p>Core Contact module (<code>/contact</code>) for simple needs or Webform for advanced forms.</p>
+<p class="q">32. What are image styles?</p><p>Reusable image transformations (scale, crop, convert) that create derivative images on demand.</p>
+<p class="q">33. How does Drupal handle multilingual?</p><p>Language, Content Translation, Interface Translation and Configuration Translation modules provide languages, translatable fields, translated UI strings and translated config.</p>
+<p class="q">34. How do you make a field translatable?</p><p>Configuration &rarr; Content language and translation &rarr; enable for the entity bundle and tick the field.</p>
+<p class="q">35. What is a revision?</p><p>A stored historical version of an entity; you can compare and revert.</p>
+
+<h2>C. Config, deployment, tooling</h2>
+<p class="q">36. How does configuration management work?</p><p>Active config lives in the database; <code>drush cex</code> writes YAML to the sync directory under Git, and <code>drush cim</code> imports it on other environments.</p>
+<p class="q">37. What is the deployment order?</p><p><code>composer install</code> &rarr; <code>drush updb</code> &rarr; <code>drush cim</code> &rarr; <code>drush cr</code> (or <code>drush deploy</code>).</p>
+<p class="q">38. What is Config Split?</p><p>Contrib module that creates environment-specific config sets (dev modules, debug settings).</p>
+<p class="q">39. Why does config import complain about UUID?</p><p>The site UUID differs; sites must share one UUID to import each other's config.</p>
+<p class="q">40. composer.json vs composer.lock?</p><p>json = requirements; lock = exact installed versions. Servers use <code>composer install</code> to reproduce.</p>
+<p class="q">41. How do you update Drupal core?</p><p>Backup; <code>composer update "drupal/core-*" --with-all-dependencies</code>; <code>drush updb</code>; <code>drush cr</code>; test; commit.</p>
+<p class="q">42. How do you apply a patch to a contrib module?</p><p>Use <code>cweagans/composer-patches</code>, add the patch URL in <code>extra.patches</code> of composer.json, run <code>composer update drupal/module</code>.</p>
+<p class="q">43. What is Drush? What is Composer? Difference?</p><p>Composer manages PHP packages (installs code). Drush operates on a Drupal site (cache, config, updates).</p>
+<p class="q">44. What is DDEV?</p><p>A Docker-based local development environment with web server, PHP, database, and tools.</p>
+<p class="q">45. How do you migrate a database between environments?</p><p><code>drush sql:dump</code> and <code>drush sql:cli &lt; file</code>, or <code>ddev export-db/import-db</code>, or <code>drush sql:sync @source @self</code> with aliases.</p>
+<p class="q">46. What is a Drush alias?</p><p>A named remote site definition (<code>@prod</code>) in <code>drush/sites/*.site.yml</code> for running commands remotely.</p>
+<p class="q">47. What is the difference between <code>drush cr</code> and <code>drush cc all</code>?</p><p><code>cr</code> rebuilds the registry/container and clears all caches (the right one in modern Drupal); <code>cc all</code> is legacy.</p>
+<p class="q">48. How do you do a major upgrade 10 &rarr; 11?</p><p>Update to the latest 10.x, enable Upgrade Status, fix deprecated code and incompatible modules, update PHP, then require core 11 with Composer, run <code>updb</code>, test.</p>
+<p class="q">49. Which files should and should not be in Git?</p><p>In: custom code, config, composer files. Out: vendor/, core/contrib (usually), files directory, local settings, secrets.</p>
+<p class="q">50. How do you manage secrets?</p><p>Environment variables, <code>settings.local.php</code> not in Git, Key module, hosting secret managers.</p>
+
+<h2>D. Theming</h2>
+<p class="q">51. What template engine does Drupal use?</p><p>Twig (Symfony); auto-escapes output.</p>
+<p class="q">52. How do you override a template?</p><p>Enable Twig debug, find the file name suggestion, copy the core template into the theme's <code>templates/</code>, rename for specificity, clear cache.</p>
+<p class="q">53. What is a preprocess function?</p><p><code>THEME_preprocess_HOOK(&amp;$variables)</code> that prepares variables for a template.</p>
+<p class="q">54. How do you add CSS/JS?</p><p>Define a library in <code>THEME.libraries.yml</code>, attach it via info.yml, Twig <code>attach_library()</code>, or <code>#attached</code>.</p>
+<p class="q">55. Base theme vs sub-theme vs Starterkit?</p><p>Sub-theme inherits from a base theme; Starterkit generates an independent copy.</p>
+<p class="q">56. What is SDC?</p><p>Single Directory Components: Twig + CSS + JS + metadata schema in one folder, reusable and documented.</p>
+<p class="q">57. What are template suggestions?</p><p>Alternative file names Drupal tries, from most specific to least, for a render element.</p>
+<p class="q">58. What does <code>{{ content|without('field_x') }}</code> do?</p><p>Renders remaining content without that field.</p>
+<p class="q">59. Why is <code>|raw</code> dangerous?</p><p>It disables escaping and enables XSS if the value contains user input.</p>
+<p class="q">60. How do you debug Twig?</p><p>Set <code>twig.config.debug: true</code> in services.yml, use <code>{{ dump(var) }}</code> or kint, inspect HTML comments.</p>
+<p class="q">61. What is the Olivero theme? Claro? Stable9? Starterkit?</p><p>Olivero = default front end; Claro = admin; Stable9 = stable markup base; Starterkit = theme generator.</p>
+<p class="q">62. What is a render array?</p><p>A nested PHP array describing output with <code>#</code> properties (<code>#theme</code>, <code>#type</code>, <code>#markup</code>, <code>#cache</code>, <code>#attached</code>), rendered by the render system.</p>
+<p class="q">63. How do you make a theme responsive?</p><p>Mobile-first CSS, breakpoints file, responsive image styles, viewport meta (in base templates).</p>
+
+<h2>E. Module development</h2>
+<p class="q">64. What files make a minimum module?</p><p>Only <code>MODULE.info.yml</code>, in <code>web/modules/custom/MODULE/</code>.</p>
+<p class="q">65. How do you create a custom page?</p><p>Routing YAML entry + controller returning a render array.</p>
+<p class="q">66. How do you restrict access to a route?</p><p>Requirements: <code>_permission</code>, <code>_role</code>, <code>_entity_access</code>, <code>_custom_access</code>.</p>
+<p class="q">67. What is a service?</p><p>A reusable object defined in services.yml and created by the container.</p>
+<p class="q">68. What is dependency injection and why use it?</p><p>Passing dependencies via the constructor for testability and loose coupling; avoid <code>\Drupal::service()</code> inside classes.</p>
+<p class="q">69. Hooks vs events?</p><p>Hooks are named Drupal extension points (OOP attribute <code>#[Hook]</code> in D11); events use Symfony's dispatcher with subscriber classes and priorities.</p>
+<p class="q">70. What is a plugin?</p><p>A discoverable class implementing one variant of a feature, e.g. blocks, field formatters, queue workers.</p>
+<p class="q">71. Annotation vs attribute plugin discovery?</p><p>Both identify plugins; attributes (<code>#[Block]</code>) are native PHP 8 and preferred in Drupal 11; annotations still work.</p>
+<p class="q">72. How do you create a block programmatically?</p><p>A class in <code>src/Plugin/Block</code> extending <code>BlockBase</code> with <code>#[Block]</code> and <code>build()</code>.</p>
+<p class="q">73. How do you create a form?</p><p>Class extending <code>FormBase</code>/<code>ConfigFormBase</code> implementing <code>getFormId, buildForm, validateForm, submitForm</code>, with a route using <code>_form</code>.</p>
+<p class="q">74. How do you alter a form?</p><p><code>hook_form_alter</code> or <code>hook_form_FORM_ID_alter</code>.</p>
+<p class="q">75. How do you load/save an entity?</p><p><code>Node::load()</code>, <code>Node::create()</code>, <code>$node-&gt;save()</code> or the entity type manager storage.</p>
+<p class="q">76. Why does entityQuery need <code>accessCheck()</code>?</p><p>It must be explicit whether to enforce entity access; omitted causes an exception since Drupal 10.</p>
+<p class="q">77. How do you write a database query safely?</p><p>Database API with placeholders/conditions, never string concatenation.</p>
+<p class="q">78. How do you store module settings?</p><p>Config API with defaults in <code>config/install</code> and a schema, edited with a ConfigFormBase form.</p>
+<p class="q">79. State vs config vs settings?</p><p>Config = exportable site config; state = environment-specific runtime values; settings = server config in settings.php.</p>
+<p class="q">80. What is <code>hook_update_N</code>?</p><p>One-time database/config update run by <code>drush updb</code> when deploying new code.</p>
+<p class="q">81. How do you create a custom entity?</p><p>Define the entity class with <code>#[ContentEntityType]</code>, interface, base fields, handlers and routes (use <code>drush generate entity:content</code>), then install it via update hook or module install.</p>
+<p class="q">82. What is a queue worker used for?</p><p>Deferring heavy or slow tasks (emails, API calls) processed by cron or <code>drush queue:run</code>.</p>
+<p class="q">83. How do you add a custom field widget or formatter?</p><p>Plugin classes in <code>src/Plugin/Field/FieldWidget</code> and <code>FieldFormatter</code>.</p>
+<p class="q">84. How do you create a custom Views field/filter?</p><p>Plugin classes under <code>src/Plugin/views/field</code> etc. plus <code>hook_views_data</code> for custom tables.</p>
+<p class="q">85. How do you log errors?</p><p><code>\Drupal::logger('mod')->error(...)</code> or an injected logger factory.</p>
+<p class="q">86. What is a route parameter converter / upcasting?</p><p>Converting <code>{node}</code> in a path into a loaded Node object automatically.</p>
+<p class="q">87. How do you handle AJAX in forms?</p><p>Add <code>#ajax</code> with a callback and wrapper to an element; Drupal replaces the wrapper with the callback's render array.</p>
+<p class="q">88. How do you send an email?</p><p>Mail manager service + <code>hook_mail()</code>.</p>
+<p class="q">89. How do you run code on cron?</p><p><code>hook_cron()</code> or a QueueWorker with a cron time.</p>
+<p class="q">90. How do you redirect a user after login?</p><p>Use the <code>user_login_form</code> alter with a submit handler (<code>$form_state-&gt;setRedirect</code>), an event subscriber, or the Login Destination module.</p>
+
+<h2>F. Caching, performance, security</h2>
+<p class="q">91. Explain cache tags, contexts and max-age.</p><p>Tags invalidate caches when data changes; contexts create variations by request conditions; max-age limits lifetime.</p>
+<p class="q">92. What is BigPipe? Dynamic page cache?</p><p>BigPipe streams personalised pieces after cached content; dynamic page cache caches pages for authenticated users with placeholders for dynamic parts.</p>
+<p class="q">93. What does max-age 0 do?</p><p>Makes the response uncacheable; it bubbles up and can disable page caching, so avoid it.</p>
+<p class="q">94. How do you speed up a slow Drupal site?</p><p>Enable caches and aggregation, Redis, CDN/Varnish, optimise Views and images, use proper cache metadata, profile with Blackfire/Xdebug, upgrade PHP, add DB indexes, reduce modules.</p>
+<p class="q">95. How do you prevent XSS?</p><p>Rely on Twig auto-escape, placeholders in <code>t()</code>, restricted text formats, <code>Xss::filter</code>, avoid <code>|raw</code>.</p>
+<p class="q">96. How do you prevent SQL injection?</p><p>Query builder and placeholders.</p>
+<p class="q">97. How do you protect against CSRF?</p><p>Form tokens; <code>_csrf_token</code> route requirement for state-changing links.</p>
+<p class="q">98. How do you keep a Drupal site secure?</p><p>Update promptly, least privilege, HTTPS, trusted hosts, restricted formats, no debug in prod, private files, backups, monitor advisories.</p>
+<p class="q">99. What are Drupal security advisories?</p><p>SA-CORE-YYYY-NNN and SA-CONTRIB-YYYY-NNN published by the Drupal Security Team with severity and fix versions.</p>
+<p class="q">100. What is the flood control?</p><p>Core limits repeated login attempts per user/IP and exposes a Flood API for custom features.</p>
+
+<h2>G. Scenario questions</h2>
+<p class="q">101. "A page shows stale content after an edit." What do you check?</p><p>Cache tags on the render array, view cache settings, CDN/Varnish purge, custom code with max-age; not just <code>drush cr</code>.</p>
+<p class="q">102. "After deployment the site shows config errors."</p><p>Check order (updb before cim), UUID mismatch, missing modules in code, <code>drush config:status</code>, logs.</p>
+<p class="q">103. "Editors need to approve content before publishing."</p><p>Content Moderation + Workflows with an Editorial workflow and role-based transitions.</p>
+<p class="q">104. "Show related articles by shared tags."</p><p>View with contextual filter "Has taxonomy term ID" using the current node's terms (default value: PHP-free option via Views "Taxonomy terms on node" with "Allow multiple values") and exclude the current node via another contextual filter "Content ID" with "Exclude".</p>
+<p class="q">105. "Build a content listing with search, filters and pagination."</p><p>Views with exposed filters + pager, or Search API with Facets for large datasets.</p>
+<p class="q">106. "Import 10,000 rows from CSV."</p><p>Migrate API with migrate_plus, migrate_source_csv, run with <code>drush migrate:import</code>, rollback to retry.</p>
+<p class="q">107. "Expose content to a React app."</p><p>JSON:API with filters/includes, CORS, Simple OAuth for authentication, caching with tags.</p>
+<p class="q">108. "A module update breaks the site."</p><p>Restore the backup/snapshot, check release notes and change records, update in a branch, run tests, fix deprecations, or apply a patch.</p>
+<p class="q">109. "Restrict a page to premium members."</p><p>Add a role and route/permission, or use Group/Content Access; for node-level, node grants.</p>
+<p class="q">110. "Different layout for one landing page."</p><p>Layout Builder per-node override, or a template suggestion by node ID/alias.</p>
+
+<h2>H. Behavioural answers (prepare 3 stories)</h2>
+<ul>
+<li>A bug you fixed (cause &rarr; how you found it with logs/Xdebug &rarr; the fix &rarr; what you learned).</li>
+<li>A feature you built (requirement &rarr; Drupal tools chosen &rarr; result).</li>
+<li>A mistake or disagreement (what happened &rarr; how you handled it).</li>
+</ul>
+<p class="q">111. "Tell me about a bug you fixed."</p>
+<p><b>Structure:</b> situation, how you investigated, fix, lesson. <b>Sample:</b> "A block on my Events site showed stale data. I checked <code>/admin/reports/dblog</code> for errors, found none, then inspected the render array and saw a hard-coded max-age and no cache tag. I added the <code>node_list:event</code> tag so it invalidates on save. I learned to treat cache metadata as part of the feature, not an afterthought."</p>
+<p class="q">112. "Tell me about a feature you built."</p>
+<p><b>Structure:</b> requirement, tools chosen and why, result. <b>Sample:</b> "I needed an events listing editors could manage without code. I made an Event content type, a View with an exposed category filter and a block for the next three events, and a role limited to creating and editing own events. Editors can publish on their own, and the whole setup is in exported config."</p>
+<p class="q">113. "Tell me about a mistake or a disagreement."</p>
+<p><b>Structure:</b> what happened, your part in it, how you fixed it, what you do now. <b>Sample:</b> "I changed settings in the UI on one environment and did not export config, so the next deploy overwrote them. I restored from the database snapshot, re-did the change, and now I always run <code>drush cex</code>, commit, and deploy with <code>drush cim</code>. I also review <code>drush config:status</code> before deploying."</p>
+<p class="q">114. "Why Drupal?"</p>
+<p><b>Sample:</b> "Its content modelling is built into core: custom content types, fields, references, granular roles and permissions, and multilingual support. The configuration management and Composer workflow also make it fit for team projects and enterprise deployments."</p>
+<p class="q">115. "Where do you see yourself improving in Drupal?"</p>
+<p><b>Sample:</b> "I have a strong grasp of site building and basic module development. Next I want more depth in the Migrate API, automated testing with PHPUnit, and performance profiling on large sites."</p>
+<div class="box warn">These are example shapes. Replace the details with what you really did, because interviewers follow up on specifics.</div>
+<div class="box warn"><b>Be honest.</b> If you built the Event site and the module from this guide, say exactly that. Interviewers value accurate answers with specific details (what you did, which command, what went wrong) more than invented experience.</div>
+
+<h1>20. Final revision checklist and mini-project</h1>
+<h2>20.1 The 2-day schedule</h2>
+<table>
+<tr><th>Block</th><th>Do</th></tr>
+<tr><td>Day 1 AM</td><td>Chapters 1-4. Start site. Build Event content type. Exercises 1.1, 2.1, 4.1.</td></tr>
+<tr><td>Day 1 PM</td><td>Chapters 5-7. Build the Views (5.1), taxonomy/menu/block/media (6.1), roles (7.1).</td></tr>
+<tr><td>Day 1 night</td><td>Chapter 8-9. Config export/import (8.1), install modules (9.1). Read Q&amp;A A-C aloud.</td></tr>
+<tr><td>Day 2 AM</td><td>Chapter 10-11. Theme + template override (10.1), module with route/block/form (11.1).</td></tr>
+<tr><td>Day 2 PM</td><td>Chapters 12-15. Service + hook (12.1), entity/DB code (13.1), XSS fix (14.1), cache tags (15.1).</td></tr>
+<tr><td>Day 2 night</td><td>Chapters 16-18, Q&amp;A D-H. Practise explaining the request lifecycle (1.5) and cache metadata (15.2) without notes.</td></tr>
+</table>
+
+<h2>20.2 Mini-project (portfolio proof)</h2>
+<p>Build the "Events site" end-to-end and put it on GitHub with a README:</p>
+<ol>
+<li>Content type Event + vocabulary + media + image style.</li>
+<li>View <code>/events</code> with exposed filter, block with next 3 events, term pages.</li>
+<li>Roles: Editor, with workflow Draft &rarr; Published.</li>
+<li>Custom theme with Event teaser template and one SDC card component.</li>
+<li>Custom module <code>training</code>: hello page, feedback form, Latest events block, service, <code>#[Hook]</code> logging.</li>
+<li>Config exported to <code>config/sync</code> and committed.</li>
+<li>JSON:API enabled; show a sample request in the README.</li>
+<li>phpcs passes on the custom module.</li>
+</ol>
+
+<h2>20.3 Interview day self-check, with model answers</h2>
+<p>Cover the answer, say yours out loud, then compare. Aim for 30-60 seconds each.</p>
+
+<p class="q">Q1. Explain entity, bundle and field.</p>
+<div class="box ans">An <b>entity type</b> is a kind of data object, such as node, user, taxonomy term or media. A <b>bundle</b> is a subtype of that entity type: Article and Event are bundles of node, and each bundle can have different fields. A <b>field</b> is a typed piece of data attached to a bundle, such as a date, text or reference. Example: "Event" is a node bundle, and its <code>field_location</code> holds the venue.</div>
+
+<p class="q">Q2. Config vs content: what is the difference and how do you move each?</p>
+<div class="box ans">Config is site structure and settings (content types, fields, views, roles, blocks). It is stored in the database but exported to YAML with <code>drush cex</code> and imported with <code>drush cim</code>, so it travels through Git. Content is user data (nodes, users, terms, media). It is not in config export. You move it with a database copy, the Migrate API, or a default-content approach. Rule of thumb: config goes up (dev to prod through Git), content comes down (prod to dev through a database copy).</div>
+
+<p class="q">Q3. Walk me through what happens when a page is requested.</p>
+<div class="box ans">The web server sends the request to <code>web/index.php</code>. Drupal boots the Symfony kernel and the service container. The router matches the path to a route (from a <code>routing.yml</code> file or a View). Access checks run. A controller (or View or entity handler) returns a render array. The render system turns it into HTML using Twig templates and the theme, attaching cache metadata. The response goes back to the browser. For anonymous users the Internal Page Cache can serve the whole page early, and for logged-in users the Dynamic Page Cache serves most of it.</div>
+
+<p class="q">Q4. Explain cache tags, contexts and max-age.</p>
+<div class="box ans"><b>Tags</b> say what data the output depends on (<code>node:5</code>, <code>node_list</code>). When that data changes, Drupal invalidates every cache item carrying the tag. <b>Contexts</b> say what request conditions make the output vary (<code>user.roles</code>, <code>languages</code>, <code>url.query_args</code>), so one cached copy is stored per value. <b>Max-age</b> says how long the output may be cached (<code>Cache::PERMANENT</code> by default, <code>0</code> means never cache and should be avoided). Example: a "latest events" block should carry the tag <code>node_list:event</code>, so it refreshes when any Event is saved, with no manual cache clear.</div>
+
+<p class="q">Q5. What is dependency injection and why does Drupal use it?</p>
+<div class="box ans">Dependency injection means a class receives the objects it needs (database, current user, logger) through its constructor instead of creating them or calling <code>\Drupal::service()</code> inside. Drupal uses it so classes are testable (you pass mocks), loosely coupled, and free of hidden global state. Controllers, forms and plugins get their dependencies through a static <code>create()</code> factory that reads from the service container.</div>
+
+<p class="q">Q6. Hooks vs events vs plugins: when do you use each?</p>
+<div class="box ans"><b>Hooks</b> are Drupal-specific extension points where you alter or react to something Drupal already does (alter a form, react to a node save). In Drupal 11 you write them as class methods with the <code>#[Hook]</code> attribute. <b>Events</b> are Symfony's dispatcher: subscriber classes with priorities, used for request/response lifecycle and newer subsystems. <b>Plugins</b> are for adding a new implementation of a feature that Drupal discovers automatically (a block, field formatter, queue worker). Short version: alter existing behavior with a hook or event, add a new option with a plugin.</div>
+
+<p class="q">Q7. How do you create a content type, a View and a role from memory?</p>
+<div class="box ans"><b>Content type:</b> Structure &rarr; Content types &rarr; Add content type, then Manage fields to add fields, Manage form display for widgets, Manage display for formatters. <b>View:</b> Structure &rarr; Views &rarr; Add view, choose what to show and the page or block option, then add fields, filters and sorts and Save. <b>Role:</b> People &rarr; Roles &rarr; Add role, then People &rarr; Permissions to tick permissions, then assign the role on the user edit form. Command-line role: <code>drush role:create editor "Editor"</code> and <code>drush role:perm:add editor "permission name"</code>.</div>
+
+<p class="q">Q8. How do you export config, write a route + controller, a block, and override a template?</p>
+<div class="box ans"><b>Export config:</b> <code>drush cex -y</code>. <b>Route + controller:</b> add an entry in <code>MODULE.routing.yml</code> with <code>path</code>, <code>defaults: _controller</code> and <code>requirements: _permission</code>, then a controller class in <code>src/Controller</code> returning a render array, then <code>drush cr</code>. <b>Block:</b> a class in <code>src/Plugin/Block</code> extending <code>BlockBase</code>, with the <code>#[Block(id:, admin_label:)]</code> attribute and a <code>build()</code> method, then place it in Block layout. <b>Override a template:</b> turn on Twig debug, read the file-name suggestions in the page source, copy the core template into your theme's <code>templates/</code>, rename it for the specific case (such as <code>node--event--teaser.html.twig</code>), edit, and run <code>drush cr</code>.</div>
+
+<p class="q">Q9. What is the update and deploy order, and which commands do you use?</p>
+<div class="box ans">Back up first. Then get the code (<code>git pull</code>), <code>composer install</code> (use <code>--no-dev</code> on production), <code>drush updb -y</code>, <code>drush cim -y</code>, <code>drush cr</code>. <code>drush deploy</code> runs the update, import and cache steps in the right order. The order matters because database updates must run before config import, and caches are cleared last. Everyday commands: <code>ddev start</code>, <code>ddev composer require drupal/NAME</code>, <code>ddev drush en NAME</code>, <code>drush cr</code>, <code>drush uli</code>, <code>drush ws</code> (logs).</div>
+
+<p class="q">Q10. What do you say when you don't know the answer?</p>
+<div class="box ans">Be honest and show your method: "I haven't used that directly. I would start with api.drupal.org for the API, the module's drupal.org page and issue queue, and the change records for my Drupal version. Then I would test it on a local DDEV site before touching anything shared." Interviewers value a clear way of finding out far more than a guess that turns out wrong.</div>
+
+<p class="q">Q11. Do I have 3 real stories? (templates, fill in with your own facts)</p>
+<div class="box ans"><b>Story 1, a problem you solved:</b> "On my training Events site, the Latest Events block did not show new events. I checked the block's <code>#cache</code> and found a fixed max-age with no cache tag. I added the <code>node_list:event</code> tag, and new events appeared immediately after saving."<br><br>
+<b>Story 2, something you built:</b> "I built an Events site with an Event content type, a View with an exposed category filter, a custom theme template for the teaser, and a custom module with a controller, a block and a feedback form. I exported config with <code>drush cex</code> and kept it in Git."<br><br>
+<b>Story 3, a mistake you learned from:</b> "I edited a module's config only in the UI on one environment and lost it on the next deploy because I had not exported it. Now I always run <code>drush cex</code>, commit the YAML, and deploy with <code>drush cim</code>."<br><br>
+<b>Important:</b> these are templates. Only tell a story that is true for you. The examples above match the exercises in this guide, so they are true once you have actually done those exercises.</div>
+
+<h2>20.4 Resources</h2>
+<ul>
+<li>api.drupal.org (API reference), drupal.org/docs (official documentation), drupal.org/project/&lt;name&gt; (modules, issue queues), drupal.org/list-changes (change records).</li>
+<li>Drupalize.Me (paid tutorials), Drupal Slack, Stack Exchange (drupal.stackexchange.com), Drupal Easy podcast.</li>
+<li>Certification: Acquia Certified Drupal Site Builder / Developer.</li>
+</ul>
+<p class="small">Verify version-specific details (for example attribute names, Starterkit commands, SDC schema URL) against the official documentation for your exact Drupal 11 minor version before the interview; APIs evolve between minor releases.</p>
+

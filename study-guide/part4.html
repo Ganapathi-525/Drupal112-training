@@ -1,0 +1,531 @@
+<h1>12. Services, dependency injection, hooks, events, plugins</h1>
+<h2>12.1 Services and the container</h2>
+<p><b>Service</b> = a PHP object with one job (logger, mailer, database, current user, entity type manager). The <b>service container</b> creates them lazily and shares one instance. Services are declared in <code>MODULE.services.yml</code>.</p>
+<pre><code># training.services.yml
+services:
+  training.greeter:
+    class: Drupal\training\Greeter
+    arguments: ['@current_user', '@logger.factory', '@entity_type.manager']</code></pre>
+<pre><code>namespace Drupal\training;
+
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+
+class Greeter {
+  public function __construct(
+    protected AccountProxyInterface $currentUser,
+    protected LoggerChannelFactoryInterface $loggerFactory,
+  ) {}
+
+  public function greet(): string {
+    $this-&gt;loggerFactory-&gt;get('training')-&gt;info('Greeted @u', ['@u' =&gt; $this-&gt;currentUser-&gt;getDisplayName()]);
+    return 'Hello ' . $this-&gt;currentUser-&gt;getDisplayName();
+  }
+}</code></pre>
+<p>Autowiring is available (<code>autowire: true</code>) in Drupal 10.2+. You can also use <code>\Drupal::service('training.greeter')</code> in procedural code, but inside classes use <b>injection</b>.</p>
+<h3>Common services</h3>
+<table>
+<tr><th>Service id</th><th>What</th></tr>
+<tr><td><code>current_user</code></td><td>Logged-in user</td></tr>
+<tr><td><code>entity_type.manager</code></td><td>Load and query entities</td></tr>
+<tr><td><code>database</code></td><td>DB connection</td></tr>
+<tr><td><code>config.factory</code></td><td>Read/write config</td></tr>
+<tr><td><code>logger.factory</code></td><td>Logging</td></tr>
+<tr><td><code>messenger</code></td><td>Status messages</td></tr>
+<tr><td><code>cache.default</code></td><td>Cache bin</td></tr>
+<tr><td><code>state</code></td><td>Key-value, non-config state</td></tr>
+<tr><td><code>date.formatter</code></td><td>Format dates</td></tr>
+<tr><td><code>request_stack</code></td><td>Current request</td></tr>
+<tr><td><code>language_manager</code></td><td>Languages</td></tr>
+<tr><td><code>plugin.manager.mail</code> / <code>plugin.manager.queue_worker</code></td><td>Mail and queues</td></tr>
+<tr><td><code>file_system</code>, <code>file_url_generator</code></td><td>Files</td></tr>
+<tr><td><code>http_client</code></td><td>Guzzle HTTP client</td></tr>
+<tr><td><code>renderer</code></td><td>Render arrays to HTML</td></tr>
+<tr><td><code>module_handler</code></td><td>Invoke hooks, check modules</td></tr>
+</table>
+
+<h2>12.2 Dependency injection in controllers, forms, blocks</h2>
+<p>Classes that are created by Drupal (controller, plugin, form) use <code>ContainerInjectionInterface</code> or <code>ContainerFactoryPluginInterface</code> with a static <code>create()</code> factory:</p>
+<pre><code>use Symfony\Component\DependencyInjection\ContainerInterface;
+class HelloController extends ControllerBase {
+  public function __construct(protected Greeter $greeter) {}
+  public static function create(ContainerInterface $container): static {
+    return new static($container-&gt;get('training.greeter'));
+  }
+  public function greet(): array { return ['#markup' =&gt; $this-&gt;greeter-&gt;greet()]; }
+}</code></pre>
+<p><b>Why DI?</b> Testability (swap dependencies with mocks), loose coupling, and no hidden globals. <code>ControllerBase</code> already gives helpers like <code>$this-&gt;currentUser()</code>, <code>$this-&gt;entityTypeManager()</code>, <code>$this-&gt;config()</code>.</p>
+
+<h2>12.3 Hooks</h2>
+<p><b>Meaning:</b> A hook is a named extension point. Modules implement it to alter or add behavior.</p>
+<h3>Drupal 11 object-oriented hooks (use this style in new code)</h3>
+<pre><code>namespace Drupal\training\Hook;
+
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Entity\EntityInterface;
+
+class TrainingHooks {
+  #[Hook('node_presave')]
+  public function nodePresave(EntityInterface $entity): void {
+    if ($entity-&gt;bundle() === 'event' &amp;&amp; $entity-&gt;isNew()) {
+      $entity-&gt;setTitle(trim($entity-&gt;getTitle()));
+    }
+  }
+
+  #[Hook('form_alter')]
+  public function formAlter(array &amp;$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id): void {
+    if ($form_id === 'node_event_form') {
+      $form['title']['widget'][0]['value']['#description'] = t('Keep it short.');
+    }
+  }
+}</code></pre>
+<p>Classic procedural style still works: in <code>training.module</code> write <code>function training_node_presave($node) {...}</code>. After adding hooks run <code>drush cr</code>. Hooks classes sit in <code>src/Hook/</code>.</p>
+<h3>Hooks you must know</h3>
+<table>
+<tr><th>Hook</th><th>When / use</th></tr>
+<tr><td><code>hook_form_alter</code>, <code>hook_form_FORM_ID_alter</code></td><td>Change any form</td></tr>
+<tr><td><code>hook_entity_presave / insert / update / delete</code> (and <code>hook_node_*</code>)</td><td>React to entity save/delete</td></tr>
+<tr><td><code>hook_entity_view_alter</code>, <code>hook_node_view</code></td><td>Alter rendered output</td></tr>
+<tr><td><code>hook_theme</code></td><td>Register theme hooks / templates</td></tr>
+<tr><td><code>hook_preprocess_HOOK</code></td><td>Prepare Twig variables</td></tr>
+<tr><td><code>hook_theme_suggestions_HOOK_alter</code></td><td>Add template suggestions</td></tr>
+<tr><td><code>hook_menu_links_discovered_alter</code>, <code>hook_link_alter</code></td><td>Alter menus/links</td></tr>
+<tr><td><code>hook_cron</code></td><td>Periodic tasks</td></tr>
+<tr><td><code>hook_install / hook_uninstall / hook_update_N</code></td><td>Lifecycle</td></tr>
+<tr><td><code>hook_mail</code>, <code>hook_mail_alter</code></td><td>Email content</td></tr>
+<tr><td><code>hook_help</code></td><td>Help text</td></tr>
+<tr><td><code>hook_query_TAG_alter</code></td><td>Alter tagged DB queries</td></tr>
+<tr><td><code>hook_views_data</code>, <code>hook_views_pre_render</code>, <code>hook_views_query_alter</code></td><td>Views integration</td></tr>
+<tr><td><code>hook_node_access</code>, <code>hook_entity_access</code></td><td>Custom access logic</td></tr>
+<tr><td><code>hook_page_attachments</code></td><td>Attach libraries/meta to pages</td></tr>
+<tr><td><code>hook_library_info_alter</code></td><td>Modify libraries</td></tr>
+</table>
+
+<h2>12.4 Events (Symfony event subscribers)</h2>
+<p><b>Meaning:</b> Use events (from Symfony) for request/response lifecycle and for newer subsystems. Hooks vs events: hooks are Drupal-specific and discovered by name; events use a dispatcher and subscribers with priorities.</p>
+<pre><code># training.services.yml
+  training.redirect_subscriber:
+    class: Drupal\training\EventSubscriber\RedirectSubscriber
+    tags:
+      - { name: event_subscriber }</code></pre>
+<pre><code>namespace Drupal\training\EventSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class RedirectSubscriber implements EventSubscriberInterface {
+  public static function getSubscribedEvents(): array {
+    return [KernelEvents::REQUEST =&gt; ['onRequest', 30]];   // priority 30
+  }
+  public function onRequest(RequestEvent $event): void {
+    // e.g. redirect /old to /new
+  }
+}</code></pre>
+<p>Typical events: <code>KernelEvents::REQUEST / RESPONSE / EXCEPTION</code>, <code>RoutingEvents::ALTER</code>, <code>ConfigEvents::SAVE</code>.</p>
+
+<h2>12.5 Plugins</h2>
+<p><b>Meaning:</b> A plugin is a class that provides one implementation of a type of functionality. A <b>plugin type</b> has a <b>manager</b>, <b>discovery</b> (attributes / annotations / YAML), and optional <b>derivers</b>.</p>
+<table>
+<tr><th>Plugin type</th><th>Folder</th><th>Example</th></tr>
+<tr><td>Block</td><td><code>src/Plugin/Block</code></td><td>Latest events</td></tr>
+<tr><td>Field type / widget / formatter</td><td><code>src/Plugin/Field/...</code></td><td>Custom field</td></tr>
+<tr><td>QueueWorker</td><td><code>src/Plugin/QueueWorker</code></td><td>Background jobs</td></tr>
+<tr><td>Action</td><td><code>src/Plugin/Action</code></td><td>Bulk actions</td></tr>
+<tr><td>Views field / filter / argument</td><td><code>src/Plugin/views/...</code></td><td>Custom view parts</td></tr>
+<tr><td>Migrate source/process/destination</td><td><code>src/Plugin/migrate/...</code></td><td>Import logic</td></tr>
+<tr><td>Condition</td><td><code>src/Plugin/Condition</code></td><td>Block visibility</td></tr>
+<tr><td>Filter</td><td><code>src/Plugin/Filter</code></td><td>Text format filter</td></tr>
+<tr><td>Constraint</td><td><code>src/Plugin/Validation/Constraint</code></td><td>Entity validation</td></tr>
+</table>
+<p><b>Annotations vs attributes:</b> annotations (<code>@Block</code>) are docblock based and still supported; attributes (<code>#[Block]</code>) are the modern PHP 8 way and recommended for new Drupal 11 code.</p>
+
+<h2>12.6 Queue example (background work)</h2>
+<pre><code>#[QueueWorker(id: 'training_email', title: new TranslatableMarkup('Send emails'), cron: ['time' =&gt; 30])]
+class EmailWorker extends QueueWorkerBase {
+  public function processItem($data) { /* send mail for $data */ }
+}
+// add to the queue
+\Drupal::queue('training_email')-&gt;createItem(['uid' =&gt; 5]);</code></pre>
+<p>Run: <code>drush queue:list</code>, <code>drush queue:run training_email</code>.</p>
+
+<h2>Exercise 12.1</h2>
+<div class="box ex"><b>Task:</b> (a) Create a service <code>training.greeter</code>. (b) Inject it into a controller. (c) Add a <code>form_alter</code> hook that adds a description on the Event node form. (d) Log a message when an Event is saved.</div>
+<div class="box ans"><b>Answer:</b> Follow 12.1 for the service and 12.2 for the controller. For (c) use the <code>#[Hook('form_alter')]</code> sample. For (d):
+<pre><code>#[Hook('node_insert')]
+public function nodeInsert(\Drupal\node\NodeInterface $node): void {
+  if ($node-&gt;bundle() === 'event') {
+    \Drupal::logger('training')-&gt;notice('Event created: @t', ['@t' =&gt; $node-&gt;label()]);
+  }
+}</code></pre>
+Check <code>/admin/reports/dblog</code> or <code>ddev drush ws --type=training</code>. The module must be enabled and caches cleared.</div>
+
+<h1>13. Entity API, database API, config API, state, cache, queue, cron</h1>
+<h2>13.1 Entity API</h2>
+<p><b>Entity types:</b> content entities (node, user, taxonomy_term, media, file, comment, block_content, paragraph) are fieldable and stored in tables; config entities (view, node_type, field_config, role, image_style) are stored in config.</p>
+<pre><code>use Drupal\node\Entity\Node;
+
+// create
+$node = Node::create([
+  'type' =&gt; 'event',
+  'title' =&gt; 'Drupal Meetup',
+  'field_location' =&gt; 'Hyderabad',
+  'status' =&gt; 1,
+]);
+$node-&gt;save();
+
+// load
+$node = Node::load(5);
+$nodes = \Drupal::entityTypeManager()-&gt;getStorage('node')-&gt;loadMultiple([1, 2]);
+
+// read/write fields
+$title = $node-&gt;label();
+$loc = $node-&gt;get('field_location')-&gt;value;
+$node-&gt;set('field_location', 'Pune')-&gt;save();
+$term = $node-&gt;get('field_category')-&gt;entity;         // referenced entity
+$ids = array_column($node-&gt;get('field_category')-&gt;getValue(), 'target_id');
+
+// delete
+$node-&gt;delete();
+
+// entity query
+$ids = \Drupal::entityQuery('node')
+  -&gt;accessCheck(TRUE)
+  -&gt;condition('type', 'event')
+  -&gt;condition('field_featured', 1)
+  -&gt;sort('created', 'DESC')
+  -&gt;range(0, 10)
+  -&gt;execute();</code></pre>
+<div class="box warn"><b>Always call <code>accessCheck(TRUE|FALSE)</code></b> on entity queries (required since Drupal 10). Use TRUE for user-facing output.</div>
+<h3>Entity concepts for interviews</h3>
+<ul>
+<li><b>Entity type</b> (definition class with handlers: storage, view builder, access, list builder, forms, route provider); <b>bundle</b>; <b>fields</b>: base fields (code-defined, e.g. title) vs configurable fields (UI-defined).</li>
+<li><b>Revisions</b> and <b>translations</b> are built into content entities.</li>
+<li><b>Custom entity</b>: define with the <code>#[ContentEntityType]</code> attribute, an interface, schema via base field definitions, and handlers. Scaffold with <code>drush generate entity:content</code>. Update schema changes with <code>hook_update_N</code> and <code>EntityDefinitionUpdateManager</code>.</li>
+<li><b>Entity access</b>: <code>$entity-&gt;access('update', $account)</code>.</li>
+<li><b>Typed data / field items</b>: <code>$node-&gt;field_x</code> is a <code>FieldItemList</code> of <code>FieldItem</code>s.</li>
+</ul>
+
+<h2>13.2 Database API</h2>
+<pre><code>$database = \Drupal::database();
+
+// select
+$result = $database-&gt;select('node_field_data', 'n')
+  -&gt;fields('n', ['nid', 'title'])
+  -&gt;condition('n.type', 'event')
+  -&gt;condition('n.status', 1)
+  -&gt;orderBy('n.created', 'DESC')
+  -&gt;range(0, 5)
+  -&gt;execute();
+foreach ($result as $row) { echo $row-&gt;title; }
+
+// insert / update / delete
+$database-&gt;insert('training_log')-&gt;fields(['msg' =&gt; 'Hi'])-&gt;execute();
+$database-&gt;update('training_log')-&gt;fields(['msg' =&gt; 'Bye'])-&gt;condition('id', 1)-&gt;execute();
+$database-&gt;delete('training_log')-&gt;condition('id', 1)-&gt;execute();
+
+// transaction
+$tx = $database-&gt;startTransaction();   // rolls back when $tx goes out of scope on exception</code></pre>
+<div class="box warn"><b>Never</b> concatenate user input into SQL. Use placeholders (<code>:name</code>) or the query builder; this prevents SQL injection.</div>
+<p><b>Entity query vs DB query:</b> use entity query for entity IDs with access/field abstraction; use the DB API for custom tables or performance-critical aggregates.</p>
+
+<h2>13.3 Configuration API</h2>
+<pre><code>$config = \Drupal::config('system.site');           // read only
+$name = $config-&gt;get('name');
+$editable = \Drupal::configFactory()-&gt;getEditable('training.settings');
+$editable-&gt;set('greeting', 'Hi')-&gt;save();</code></pre>
+<p><b>Simple config</b> (a single object like <code>system.site</code>) vs <b>config entities</b> (many, like views). Schema in <code>config/schema</code> is required, or you get "missing schema" errors in tests.</p>
+
+<h2>13.4 State API, key/value, settings</h2>
+<ul>
+<li><b>State</b>: <code>\Drupal::state()-&gt;set('training.last_run', time());</code> &mdash; environment-specific values not exported (last cron time).</li>
+<li><b>Key-value store</b>: general storage <code>keyvalue</code> / <code>keyvalue.expirable</code>.</li>
+<li><b>Settings</b> (<code>settings.php</code>): <code>\Drupal\Core\Site\Settings::get('hash_salt')</code> &mdash; credentials and server-specific values.</li>
+<li><b>Rule:</b> editors change it &rarr; config; code/environment sets it &rarr; settings; runtime-only memory &rarr; state; user-generated data &rarr; entity.</li>
+</ul>
+
+<h2>13.5 Cache API</h2>
+<pre><code>$cid = 'training:feed';
+if ($cache = \Drupal::cache()-&gt;get($cid)) { $data = $cache-&gt;data; }
+else {
+  $data = expensive();
+  \Drupal::cache()-&gt;set($cid, $data, time() + 3600, ['node_list']);   // expire + tags
+}
+\Drupal\Core\Cache\Cache::invalidateTags(['node_list']);</code></pre>
+<p>Details in Chapter 15.</p>
+
+<h2>13.6 Cron</h2>
+<ul>
+<li>Cron runs periodic tasks (clear caches, index search, run queues, check updates).</li>
+<li>Run manually: <code>ddev drush cron</code> or UI <code>/admin/config/system/cron</code>.</li>
+<li>Implement <code>hook_cron()</code> (or <code>#[Hook('cron')]</code>) or a queue worker with <code>cron:</code> time.</li>
+<li>Production: use system cron or a scheduler calling <code>drush cron</code> (Automated Cron runs on page requests, not ideal for production).</li>
+</ul>
+
+<h2>13.7 Mail</h2>
+<pre><code>$mailManager = \Drupal::service('plugin.manager.mail');
+$mailManager-&gt;mail('training', 'notify', $to, 'en', ['msg' =&gt; 'Hi'], NULL, TRUE);
+// hook_mail() builds subject/body
+function training_mail($key, &amp;$message, $params) {
+  if ($key == 'notify') { $message['subject'] = 'Hello'; $message['body'][] = $params['msg']; }
+}</code></pre>
+<p>Locally, view mail in <code>ddev mailpit</code>.</p>
+
+<h2>13.8 Logging and messages</h2>
+<pre><code>\Drupal::logger('training')-&gt;error('Failed: @e', ['@e' =&gt; $msg]);   // levels: debug info notice warning error critical alert emergency
+\Drupal::messenger()-&gt;addStatus('Saved');   // addWarning / addError</code></pre>
+
+<h2>Exercise 13.1</h2>
+<div class="box ex"><b>Task:</b> Using <code>drush php:eval</code> create an Event node, then query for featured events and print titles, then change one title.</div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush php:eval '
+$n = \Drupal\node\Entity\Node::create(["type"=&gt;"event","title"=&gt;"CLI Event","field_featured"=&gt;1,"status"=&gt;1]); $n-&gt;save();
+$ids = \Drupal::entityQuery("node")-&gt;accessCheck(FALSE)-&gt;condition("type","event")-&gt;condition("field_featured",1)-&gt;execute();
+foreach (\Drupal\node\Entity\Node::loadMultiple($ids) as $e) { echo $e-&gt;label().PHP_EOL; }
+$n-&gt;setTitle("CLI Event v2")-&gt;save();'</code></pre></div>
+
+<h1>14. Security</h1>
+<h2>14.1 Threats and Drupal's defences</h2>
+<table>
+<tr><th>Threat</th><th>Meaning</th><th>Prevention in Drupal</th></tr>
+<tr><td><b>XSS</b> (cross-site scripting)</td><td>Attacker injects JavaScript into pages</td><td>Twig auto-escapes; use <code>#markup</code> (filtered) or <code>#plain_text</code>; <code>Xss::filterAdmin()</code>, <code>Html::escape()</code>; never <code>|raw</code> on user input; restrict text formats.</td></tr>
+<tr><td><b>SQL injection</b></td><td>Attacker alters SQL</td><td>Use query builder / placeholders. No string concatenation.</td></tr>
+<tr><td><b>CSRF</b></td><td>Forged requests by a logged-in user</td><td>Form tokens automatic; routes with <code>_csrf_token: 'TRUE'</code> requirement for links that change data.</td></tr>
+<tr><td><b>Access bypass</b></td><td>Users reach what they should not</td><td>Always set route <code>requirements</code>, check entity access, use <code>accessCheck(TRUE)</code>.</td></tr>
+<tr><td><b>File upload attacks</b></td><td>Malicious files</td><td>Restrict extensions, use private files for sensitive data, never allow php/exe.</td></tr>
+<tr><td><b>Brute force</b></td><td>Password guessing</td><td>Flood control (core), Login Security, strong passwords, 2FA module.</td></tr>
+<tr><td><b>Session hijacking</b></td><td>Stolen session cookie</td><td>HTTPS everywhere, secure cookies, session regeneration (core does).</td></tr>
+<tr><td><b>Information disclosure</b></td><td>Errors leak details</td><td>Production: hide errors (<code>/admin/config/development/logging</code> &rarr; None), keep settings.php out of web writable.</td></tr>
+<tr><td><b>Outdated code</b></td><td>Known vulnerabilities</td><td>Apply security updates quickly (Drupal Security Team advisories SA-CORE / SA-CONTRIB).</td></tr>
+</table>
+
+<h2>14.2 Security checklist</h2>
+<ul>
+<li>Use HTTPS; set <code>$settings['trusted_host_patterns']</code> in settings.php.</li>
+<li>Keep core and contrib updated: <code>composer audit</code>, <b>Available updates</b> report.</li>
+<li>Least-privilege roles; do not hand out "administer ..." permissions.</li>
+<li>Use "Basic HTML" for authenticated users, "Restricted HTML" for anonymous; Full HTML for admins only.</li>
+<li>Protect <code>settings.php</code>: <code>chmod 444</code>; put <code>sites/default/files/private</code> outside the web root: <code>$settings['file_private_path'] = '../private';</code>.</li>
+<li>Disable dev modules (devel, webprofiler) in production.</li>
+<li>Change user 1's name from "admin"; use strong passwords; consider 2FA.</li>
+<li>Block users from PHP execution in files directories (Apache/Nginx rules; Drupal writes .htaccess).</li>
+<li>Check <code>/admin/reports/status</code> for warnings, and use the <b>Security Review</b> module.</li>
+<li>Do not run <code>update.php</code> access publicly (<code>$settings['update_free_access'] = FALSE;</code>).</li>
+</ul>
+
+<h2>14.3 Code-level security patterns</h2>
+<pre><code>use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
+$safe = Html::escape($user_input);
+$filtered = Xss::filter($user_input);                // allows safe tags
+$build = ['#markup' =&gt; $this-&gt;t('Hi @n', ['@n' =&gt; $name])];   // placeholder escapes
+// CSRF-protected link route
+# routing: requirements: _csrf_token: 'TRUE'
+// access result with caching
+return AccessResult::allowedIfHasPermission($account, 'administer training')-&gt;cachePerPermissions();</code></pre>
+
+<h2>Exercise 14.1</h2>
+<div class="box ex"><b>Task:</b> A teammate wrote <code>'#markup' =&gt; '&lt;p&gt;Hello ' . $_GET['name'] . '&lt;/p&gt;'</code>. Explain the vulnerability and fix it.</div>
+<div class="box ans"><b>Answer:</b> It is reflected XSS: <code>?name=&lt;script&gt;...&lt;/script&gt;</code> runs script in the visitor's browser. Fix: use the Request object, a placeholder and escaping:
+<pre><code>$name = \Drupal::request()-&gt;query-&gt;get('name', '');
+return ['#markup' =&gt; $this-&gt;t('Hello @name', ['@name' =&gt; $name])];
+// or '#plain_text' =&gt; $name, and add cache context 'url.query_args:name'</code></pre></div>
+
+<h1>15. Performance and caching</h1>
+<h2>15.1 Drupal cache layers</h2>
+<table>
+<tr><th>Layer</th><th>Meaning</th></tr>
+<tr><td><b>Internal Page Cache</b></td><td>Caches full pages for anonymous users (core module).</td></tr>
+<tr><td><b>Dynamic Page Cache</b></td><td>Caches pages for all users except the personalised parts (placeholders).</td></tr>
+<tr><td><b>BigPipe</b></td><td>Streams cacheable page parts first, then personalised parts.</td></tr>
+<tr><td><b>Render cache</b></td><td>Caches render array fragments.</td></tr>
+<tr><td><b>Twig cache</b></td><td>Compiled templates in PHP files.</td></tr>
+<tr><td><b>Views cache</b></td><td>Query results and rendered output (Tag based / Time based).</td></tr>
+<tr><td><b>Cache bins</b></td><td>Storage buckets: <code>default, render, data, discovery, bootstrap, config, entity, menu, page, dynamic_page_cache</code>.</td></tr>
+<tr><td><b>Backend</b></td><td>Database by default; Redis/Memcache for speed.</td></tr>
+<tr><td><b>Browser/CDN cache</b></td><td>Controlled by <code>Cache-Control</code> max-age (Performance page) and a CDN or Varnish.</td></tr>
+</table>
+
+<h2>15.2 Cache metadata (the 3 pieces) &mdash; very common question</h2>
+<table>
+<tr><th>Metadata</th><th>Meaning</th><th>Example</th></tr>
+<tr><td><b>Tags</b></td><td>"What data did this depend on?" When tagged data changes, the cache is invalidated.</td><td><code>node:5</code>, <code>node_list</code>, <code>config:system.site</code>, <code>user:3</code></td></tr>
+<tr><td><b>Contexts</b></td><td>"What request conditions cause variations?" One cached copy per context value.</td><td><code>user.roles</code>, <code>languages</code>, <code>url.path</code>, <code>url.query_args</code>, <code>route</code>, <code>theme</code>, <code>user.permissions</code></td></tr>
+<tr><td><b>Max-age</b></td><td>"How long can this be cached?" <code>0</code> = never cache (avoid; it disables page cache), <code>Cache::PERMANENT</code> = until tags invalidate.</td><td><code>3600</code></td></tr>
+</table>
+<pre><code>$build['#cache'] = [
+  'tags' =&gt; ['node_list:event', 'config:training.settings'],
+  'contexts' =&gt; ['user.roles', 'url.query_args:category'],
+  'max-age' =&gt; Cache::PERMANENT,
+];
+// a node: $node-&gt;getCacheTags() returns ['node:5']</code></pre>
+<div class="box"><b>Interview one-liner:</b> "Drupal's cache is correct by default: every render array carries tags, contexts and max-age. Cache invalidation is by tag, so editing a node automatically refreshes every page that displayed it."</div>
+<h3>Lazy builders / placeholders</h3>
+<p>For personalised or uncacheable parts (cart count, username) use <code>#lazy_builder</code> so the rest of the page stays cached and BigPipe/dynamic page cache fills in the placeholder.</p>
+
+<h2>15.3 Performance settings and tuning</h2>
+<ul>
+<li><b>Configuration &rarr; Development &rarr; Performance</b> (<code>/admin/config/development/performance</code>): browser and proxy cache max age, aggregate CSS/JS (on in production), clear all caches.</li>
+<li>Enable <b>Internal Page Cache</b>, <b>Dynamic Page Cache</b>, <b>BigPipe</b>.</li>
+<li>Use <b>Redis</b> for cache and locks; <b>Varnish</b> or a CDN (Cloudflare, Fastly) for full-page caching with tag-based purging.</li>
+<li>Optimise images: image styles, WebP, lazy loading, responsive images.</li>
+<li>Views: avoid loading all entities for huge lists; use fields instead of full entity rendering; add pagers; use caching; avoid heavy relationships.</li>
+<li>Database: indexes on custom tables, avoid N+1 queries (use <code>loadMultiple</code>), PHP OPcache enabled, current PHP version.</li>
+<li>Profiling tools: Devel/Webprofiler (dev), Blackfire, New Relic, Xdebug profiler, <code>ddev xdebug</code>.</li>
+</ul>
+<h3>drush cr vs ... when to clear cache</h3>
+<table>
+<tr><th>After you change</th><th>Do</th></tr>
+<tr><td>Twig template (new file), theme hook, library, info.yml, routing, services, hooks, plugin (new class)</td><td><code>drush cr</code></td></tr>
+<tr><td>Editing an existing Twig file with Twig cache on</td><td>Usually reloads automatically in dev (auto_reload), else <code>drush cr</code></td></tr>
+<tr><td>Content or config through the UI</td><td>Nothing; tags invalidate automatically</td></tr>
+<tr><td>CSS/JS aggregation issues</td><td><code>drush cr</code> then hard refresh the browser</td></tr>
+</table>
+
+<h2>Exercise 15.1</h2>
+<div class="box ex"><b>Task:</b> A block shows "Latest 3 events" but new events do not appear for an hour. Why, and what is the right fix? </div>
+<div class="box ans"><b>Answer:</b> The block uses <code>max-age 3600</code> without a tag for the list. Fix with the right cache tag so it invalidates when any Event changes: <code>'#cache' =&gt; ['tags' =&gt; ['node_list:event']]</code> (and keep <code>max-age</code> permanent). Do not set max-age to 0 or call <code>drush cr</code> as a workaround. If the content depends on the user's role, add the context <code>user.roles</code>.</div>
+
+<h1>16. Testing, coding standards, debugging</h1>
+<h2>16.1 Test types</h2>
+<table>
+<tr><th>Type</th><th>Base class</th><th>Meaning / speed</th></tr>
+<tr><td>Unit</td><td><code>UnitTestCase</code></td><td>One class, no Drupal bootstrap. Fastest.</td></tr>
+<tr><td>Kernel</td><td><code>KernelTestBase</code></td><td>Partial Drupal bootstrap with selected modules, real DB. Good for services, entities.</td></tr>
+<tr><td>Functional</td><td><code>BrowserTestBase</code></td><td>Full site, simulated browser (no JavaScript). Slower.</td></tr>
+<tr><td>FunctionalJavascript</td><td><code>WebDriverTestBase</code></td><td>Real browser with JS (needs Chrome/Selenium).</td></tr>
+<tr><td>Nightwatch / Playwright / Cypress</td><td>-</td><td>End-to-end (front end).</td></tr>
+</table>
+<pre><code>// web/modules/custom/training/tests/src/Unit/GreeterTest.php
+namespace Drupal\Tests\training\Unit;
+use Drupal\Tests\UnitTestCase;
+class GreeterTest extends UnitTestCase {
+  public function testGreeting(): void { $this-&gt;assertSame('Hello', 'Hello'); }
+}</code></pre>
+<pre><code>ddev exec "cd web &amp;&amp; ../vendor/bin/phpunit -c core modules/custom/training/tests"
+# needs phpunit config: copy web/core/phpunit.xml.dist to web/phpunit.xml, set SIMPLETEST_DB and SIMPLETEST_BASE_URL</code></pre>
+<p><b>Testing frameworks:</b> PHPUnit (core), Behat (behaviour), Playwright/Cypress (E2E). Require dev tools with <code>ddev composer require --dev drupal/core-dev</code>.</p>
+
+<h2>16.2 Coding standards and static analysis</h2>
+<pre><code>ddev composer require --dev drupal/coder phpstan/phpstan mglaman/phpstan-drupal
+ddev exec vendor/bin/phpcs --standard=Drupal,DrupalPractice web/modules/custom
+ddev exec vendor/bin/phpcbf --standard=Drupal web/modules/custom    # auto-fix
+ddev exec vendor/bin/phpstan analyse web/modules/custom --level=5</code></pre>
+<p>Drupal coding standard: 2-space indentation, <code>lowerCamelCase</code> methods/properties, <code>snake_case</code> for procedural functions and variables in procedural code (modern code uses camelCase), docblocks for classes and methods, <code>use</code> statements at top, files end with a newline.</p>
+
+<h2>16.3 Debugging toolbox</h2>
+<table>
+<tr><th>Tool</th><th>How / when</th></tr>
+<tr><td>Watchdog / dblog</td><td><code>/admin/reports/dblog</code> or <code>drush ws</code>; <code>drush ws --severity=error --count=20</code>; tail live: <code>drush ws --tail</code></td></tr>
+<tr><td>Error display</td><td><code>/admin/config/development/logging</code> &rarr; "All messages, with backtrace" (dev only). Or in settings.local.php: <code>$config['system.logging']['error_level'] = 'verbose';</code></td></tr>
+<tr><td>Devel</td><td><code>dpm($var)</code> / <code>dd($var)</code> / <code>kint($var)</code> (needs devel + kint). <code>ddev drush ev "dpm(1)"</code> alternatives: <code>\Drupal::logger()</code>.</td></tr>
+<tr><td>Xdebug</td><td><code>ddev xdebug on</code>, set breakpoints in VS Code (PHP Debug extension) and listen on port 9003; <code>ddev xdebug off</code> when done (it slows PHP).</td></tr>
+<tr><td>Twig debug</td><td>Section 10.5</td></tr>
+<tr><td>Views</td><td>Settings &rarr; show SQL query and timing; Preview section.</td></tr>
+<tr><td>Browser tools</td><td>Network, console; Drupal sends headers <code>X-Drupal-Cache</code>, <code>X-Drupal-Dynamic-Cache</code>, and with debug enabled <code>X-Drupal-Cache-Tags</code>.</td></tr>
+<tr><td>Status report</td><td><code>/admin/reports/status</code></td></tr>
+<tr><td>Local settings</td><td><code>settings.local.php</code> with dev overrides, loaded at the bottom of settings.php.</td></tr>
+</table>
+<h3>Common problems &rarr; fix</h3>
+<table>
+<tr><th>Symptom</th><th>Likely fix</th></tr>
+<tr><td>White screen (WSOD) / "The website encountered an unexpected error"</td><td>Check dblog or <code>ddev logs</code>; fix PHP error; <code>drush cr</code></td></tr>
+<tr><td>Changes to Twig/CSS not showing</td><td><code>drush cr</code>; disable CSS aggregation in dev; hard refresh</td></tr>
+<tr><td>"Page not found" for a new route</td><td><code>drush cr</code>; check indentation in routing.yml</td></tr>
+<tr><td>"Module not found" after composer</td><td>Check path <code>web/modules/contrib</code>; <code>ddev composer install</code>; <code>drush en</code></td></tr>
+<tr><td>Config import fails with UUID mismatch</td><td>Site UUID differs: set same UUID or reinstall from the exported config</td></tr>
+<tr><td>"Allowed memory size exhausted"</td><td>Increase PHP memory (<code>.ddev/php/*.ini</code>); investigate big loops, use batch/queues</td></tr>
+<tr><td>Permission denied on files</td><td>Fix ownership/chmod on <code>sites/default/files</code></td></tr>
+<tr><td>Locked out</td><td><code>ddev drush uli</code> or <code>drush upwd admin newpass</code></td></tr>
+<tr><td>Update hook pending</td><td><code>drush updb -y</code></td></tr>
+<tr><td>Composer conflict</td><td><code>composer why-not</code>, <code>composer prohibits</code>; update with <code>--with-all-dependencies</code></td></tr>
+</table>
+
+<h1>17. Migrate, JSON:API, headless, multilingual, deployment</h1>
+<h2>17.1 Migrate API</h2>
+<p><b>Meaning:</b> A framework to import data from other sources (CSV, JSON, SQL, another Drupal site) into Drupal. Pipeline: <b>source</b> &rarr; <b>process</b> (transform field by field) &rarr; <b>destination</b>. IDs are tracked in map tables to support rollback and updates.</p>
+<pre><code># migrations on a custom module: config/install/migrate_plus.migration.events_csv.yml
+# or core-only: migrations/events_csv.yml
+id: events_csv
+label: Events from CSV
+source:
+  plugin: csv           # from migrate_source_csv
+  path: modules/custom/training/data/events.csv
+  ids: [id]
+process:
+  title: name
+  field_location: place
+  type:
+    plugin: default_value
+    default_value: event
+destination:
+  plugin: entity:node</code></pre>
+<pre><code>ddev composer require drupal/migrate_plus drupal/migrate_tools drupal/migrate_source_csv
+ddev drush en migrate_plus migrate_tools migrate_source_csv -y
+ddev drush migrate:status
+ddev drush migrate:import events_csv
+ddev drush migrate:rollback events_csv
+ddev drush migrate:import events_csv --update</code></pre>
+<p>Core Drupal-to-Drupal upgrades (7 &rarr; 10/11) use the <code>migrate_drupal</code> and <code>migrate_drupal_ui</code> modules (<code>/upgrade</code>). Common process plugins: <code>get, default_value, static_map, migration_lookup, concat, explode, callback, format_date, skip_on_empty, sub_process, entity_generate</code>.</p>
+
+<h2>17.2 JSON:API and REST (headless Drupal)</h2>
+<ul>
+<li><b>JSON:API</b> (core) automatically exposes all entities: <code>/jsonapi/node/event</code>, <code>/jsonapi/node/event/{uuid}</code>. Supports <code>filter</code>, <code>sort</code>, <code>page[limit]</code>, <code>include</code>, <code>fields[node--event]=title,field_location</code>.</li>
+<li>Enable: <code>ddev drush en jsonapi -y</code>. Config: <code>/admin/config/services/jsonapi</code> (read-only mode recommended unless you need writes).</li>
+<li>Example: <code>/jsonapi/node/event?filter[field_featured]=1&amp;sort=-created&amp;page[limit]=5&amp;include=field_category</code></li>
+<li><b>RESTful Web Services</b> (core): custom resources and Views "REST export" display.</li>
+<li><b>GraphQL</b> (contrib) is an alternative.</li>
+<li><b>Authentication:</b> cookie (same domain), Basic Auth (core), OAuth2 / Simple OAuth (contrib), JWT (contrib). Always use HTTPS.</li>
+<li><b>CORS:</b> in <code>sites/default/services.yml</code>: <code>cors.config: enabled: true, allowedOrigins: ['https://app.example.com']</code>.</li>
+<li><b>Decoupled / headless:</b> Drupal as the back end, a JS front end (Next.js, Nuxt, React). <b>Progressively decoupled</b>: Drupal renders pages and parts use JS components.</li>
+</ul>
+
+<h2>17.3 Multilingual</h2>
+<ol>
+<li>Enable <code>language</code>, <code>content_translation</code>, <code>locale</code> (interface translation), <code>config_translation</code>.</li>
+<li><b>Add languages:</b> Configuration &rarr; Regional and language &rarr; Languages &rarr; Add language.</li>
+<li><b>Detection:</b> Languages &rarr; Detection and selection (URL prefix <code>/fr/...</code>, domain, session, browser, user).</li>
+<li><b>Enable translation for content type:</b> Configuration &rarr; Regional and language &rarr; Content language and translation (<code>/admin/config/regional/content-language</code>) &rarr; tick Content &rarr; Event &rarr; mark fields translatable.</li>
+<li><b>Translate:</b> Node &rarr; Translate tab &rarr; Add. <b>Interface strings:</b> Configuration &rarr; Regional and language &rarr; User interface translation. <b>Config:</b> Configuration &rarr; Regional and language &rarr; Configuration translation.</li>
+</ol>
+<p>Commands: <code>drush locale:check</code>, <code>drush locale:update</code>. Use <code>$this-&gt;t()</code> and <code>{{ 'text'|t }}</code> for all strings.</p>
+
+<h2>17.4 Deployment workflow</h2>
+<pre><code># local
+git pull
+ddev composer install
+ddev drush updb -y
+ddev drush cim -y
+ddev drush cr
+
+# production deploy script (typical)
+git pull origin main
+composer install --no-dev --optimize-autoloader
+drush maintenance:set 1   # optional (drush state:set system.maintenance_mode 1)
+drush updb -y
+drush cim -y
+drush cr
+drush maintenance:set 0</code></pre>
+<ul>
+<li><b>Order matters:</b> code &rarr; <code>composer install</code> &rarr; <code>updb</code> &rarr; <code>cim</code> &rarr; <code>cr</code>.</li>
+<li><b>Environments:</b> local (DDEV) &rarr; dev &rarr; staging &rarr; production. Content flows production &rarr; down (database copy); config flows up (via Git).</li>
+<li><b>Hosting:</b> Acquia, Pantheon, Platform.sh / Upsun, DDEV Pro, Amazon, plain VPS with Nginx + PHP-FPM + MariaDB.</li>
+<li><b>CI/CD:</b> GitHub Actions / GitLab CI / Jenkins: install, lint (phpcs), static analysis (phpstan), tests (phpunit), then deploy.</li>
+<li><b>Version control:</b> commit <code>composer.json</code>, <code>composer.lock</code>, <code>config/</code>, <code>web/modules/custom</code>, <code>web/themes/custom</code>. Do <b>not</b> commit <code>vendor/</code> (unless host requires), <code>web/core</code> and contrib (installed by composer), <code>web/sites/default/files</code>, <code>settings.local.php</code>.</li>
+<li><b>Backups:</b> <code>drush sql:dump --gzip --result-file=../backup.sql</code> and file backups.</li>
+<li><b>Maintenance mode:</b> <code>/admin/config/development/maintenance</code>.</li>
+</ul>
+
+<h2>17.5 Multisite, install profiles, distributions</h2>
+<ul>
+<li><b>Multisite:</b> one codebase, multiple sites in <code>web/sites/&lt;name&gt;/</code>, with <code>sites.php</code> mapping domains. Pros: shared code updates; cons: shared failure points.</li>
+<li><b>Install profile:</b> predefines modules/config at install (Standard, Minimal, Demo Umami).</li>
+<li><b>Distribution:</b> profile + code for a use case (Drupal CMS, OpenSocial).</li>
+</ul>
+
+<h2>Exercise 17.1</h2>
+<div class="box ex"><b>Task:</b> Enable JSON:API and fetch featured events with their category names and only title + location fields. </div>
+<div class="box ans"><b>Answer:</b>
+<pre><code>ddev drush en jsonapi -y
+curl "https://drupal112-training.ddev.site/jsonapi/node/event?filter[field_featured]=1&amp;include=field_category&amp;fields[node--event]=title,field_location,field_category&amp;fields[taxonomy_term--event_category]=name"</code></pre>
+Anonymous users need "Access content" permission. Terms are returned in the <code>included</code> array.</div>
+
